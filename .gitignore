@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 #other
 .docs/
+.lichess.token
