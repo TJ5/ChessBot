@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 #other
-.docs/
-.lichess.token
+docs/
+lichess.token
