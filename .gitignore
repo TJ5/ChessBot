@@ -130,3 +130,4 @@ dmypy.json
 #other
 docs/
 lichess.token
+launch.json
