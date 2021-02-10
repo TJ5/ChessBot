@@ -10,7 +10,7 @@ client = berserk.Client(session)
 print(client.account.get_email()) #test client is working
 
 for event in client.bots.stream_incoming_events():
-    print(event)
+    
     #logic to filter out variants 
     if event['type'] == 'challenge':
         if True:
