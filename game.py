@@ -1,22 +1,25 @@
 import threading
-from mockstream import MockStream
 from bot import Bot
-import berserk
+
+from mockclient import MockClient
 class Game(threading.Thread):
-    def __init__(self, test_mode: bool, client: berserk.Client, game_id, **kwargs):
+    def __init__(self, client, game_id, **kwargs):
         super().__init__(**kwargs)
         self.game_id = game_id
         self.client = client
-        if test_mode == False:
+
+        #set stream to test stream or lichess stream
+        #initialize test_mode var to know where to make moves
+        if (isinstance(client, MockClient)):
+            self.stream = client.stream()
+            self.test_mode = True
+        else: #set stream to lichess game event stream
             self.stream = client.bots.stream_game_state(game_id)
-        else: #testing
-            m = MockStream()
-            self.stream = m.stream()
-        #initialize two fields for whose turn it is and the bots piece color
-        self.botpieces = "white"
+            self.test_mode = False
         
-        #define their values
-        self.current_state = next(self.stream)
+        #define variable to store which side the bot plays
+        self.botpieces = "white"
+        self.current_state = next(self.stream) #stores JSON on all pertinent info to the game on start
         if (not (self.current_state['white']['id'] == 'whenchess')):
             self.botpieces = "black"
             
@@ -25,36 +28,54 @@ class Game(threading.Thread):
     
     
     def run(self):
+        #play the first move if white
         if (self.botpieces == "white"):
             self.handle_state_change(self.current_state['state'])
+        #event loop for game state updates
         for event in self.stream:
-            print(event)
+            
             if event['type'] == 'gameState':
-                
-                
-                self.handle_state_change(event)
+
+                game_running = self.handle_state_change(event)
+                if not (game_running):
+                    return
                 
             elif event['type'] == 'chatLine':
                 self.handle_chat_line(event)
 
     
-    
+    #Handle any game state change 
+    #Returns False if game has ended, True if game continues but it is not the bot's turn, and returns the move made if applicable.
     def handle_state_change(self, game_state):
+        
         if ((game_state['status'] == 'created') or (game_state['status'] == 'started')): #game in progress
             #logic here to be implemented on when to accept draws
-            move = self.bot.updateboard(game_state["moves"])
+
+            #get a uci string move from bot.py
+            if (self.test_mode):
+                move = self.bot.updateboardtest(game_state["moves"])
+            else:
+                move = self.bot.updateboard(game_state["moves"])
+            #make move if it is bot's turn, null move is ignored if not
             if (move):
                 self.makemove(move)
+                return move
             else:
-                return
+                return True
 
-        else:
+        else: #game has ended
             print("game end")
-            pass
+            return False
 
     def handle_chat_line(self, chat_line):
         #ignoring chat for now
         pass
+    #passes uci strings to lichess
     def makemove(self, move: str):
-        self.client.bots.make_move(self.game_id, move)
+        if not (self.test_mode):
+            self.client.bots.make_move(self.game_id, move) 
+        else: 
+            self.client.makemockmove(move)
     
+    def getbot(self):
+        return self.bot

@@ -1,30 +1,39 @@
 from boardwrapper import BoardWrapper
 import chess
 class Bot():
-    def __init__(self, pieces: str):
+    def __init__(self, piececolor: str):
         self.board = BoardWrapper()
-        self.pieces = pieces
-        if (self.pieces == "white"):
-            self.pieces = chess.WHITE
+        self.piececolor = piececolor
+        if (self.piececolor == "white"):
+            self.piececolor = chess.WHITE
         else:
-            self.pieces = chess.BLACK
+            self.piececolor = chess.BLACK
+    #updates board representing game state and returns move to make, if applicable
     def updateboard(self, moves: str):
         self.board = self.board.updateboard(moves)
-        print(self.board.getfen())
-        if (self.board.getturn() == self.pieces):
-            #print(self.board.getturn())
-            return self.getmove()
-            
+        #check if it is the bot's turn to play, if so, return move
+        if (self.board.getturn() == self.piececolor):
+            return self.getmove()  
         else:
-            #print(self.board.getturn())
+            return None
+    #resets board, then makes every move in the provided move string
+    #for testing purposes, for inputting an arbitrary position
+    def updateboardtest(self, moves: str):
+        self.board = self.board.updateboardtest(moves)
+        #check if it is the bot's turn to play, if so, return move
+        if (self.board.getturn() == self.piececolor):
+            return self.getmove()  
+        else:
             pass
+    #Gets any legal move, without logic
+    #To be changed
     def getmove(self):
-        
         move = self.board.getmove()
-           
-        
-        
+    
         ucimove = chess.Move.uci(move)
-        print(ucimove)
-        return ucimove
         
+        return ucimove
+    
+    def getboard(self):
+        return self.board.getboard()
+    

@@ -1,7 +1,7 @@
 
 import berserk 
 from game import Game
-
+import threading
 F = open('lichess.token', 'r')
 token = F.readline()
 
@@ -21,8 +21,8 @@ for event in client.bots.stream_incoming_events():
     elif event['type'] == 'gameStart':
         pass
         #Call a Game object that handles the stream of state changes of the game 
-        id = event['game']['id']
-        game = Game(False, client, id)
+        id = event['game']['id'] 
+        game = Game(client, id)
         game.start()    
-    
+    print(threading.enumerate())
         
