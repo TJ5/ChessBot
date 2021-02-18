@@ -11,28 +11,33 @@ class Bot():
     #updates board representing game state and returns move to make, if applicable
     def updateboard(self, moves: str):
         self.board = self.board.updateboard(moves)
-        #check if it is the bot's turn to play, if so, return move
-        if (self.board.getturn() == self.piececolor):
-            return self.getmove()  
-        else:
+        
+        #return None if the latest update has created a draw by repetition and ended the game
+        #return True if the game is still continuing
+        if (self.board.isrepetition()):
             return None
+        return True
+        
     #resets board, then makes every move in the provided move string
     #for testing purposes, for inputting an arbitrary position
     def updateboardtest(self, moves: str):
         self.board = self.board.updateboardtest(moves)
         #check if it is the bot's turn to play, if so, return move
-        if (self.board.getturn() == self.piececolor):
-            return self.getmove()  
-        else:
-            pass
+        if (self.board.isrepetition()):
+            return None
+        return True
     #Gets any legal move, without logic
     #To be changed
     def getmove(self):
-        move = self.board.getmove()
-    
-        ucimove = chess.Move.uci(move)
+        #return move if it is the bot's turn to play]
+        #else, ignore
+        if (self.board.getturn() == self.piececolor):
+            move = self.board.getmove()
+            ucimove = chess.Move.uci(move)
+            return ucimove
+        else:
+            return None
         
-        return ucimove
     
     def getboard(self):
         return self.board.getboard()

@@ -51,11 +51,20 @@ class Game(threading.Thread):
         if ((game_state['status'] == 'created') or (game_state['status'] == 'started')): #game in progress
             #logic here to be implemented on when to accept draws
 
-            #get a uci string move from bot.py
+            
+            #if test mode, support inputting an arbitrary position
             if (self.test_mode):
-                move = self.bot.updateboardtest(game_state["moves"])
+                gamecont = self.bot.updateboardtest(game_state["moves"])
+                
             else:
-                move = self.bot.updateboard(game_state["moves"])
+                gamecont = self.bot.updateboard(game_state["moves"])
+            
+            #get a uci string move from bot.py
+            if (gamecont):
+                move = self.bot.getmove()
+            else:
+                print("draw made")
+                return False
             #make move if it is bot's turn, null move is ignored if not
             if (move):
                 self.makemove(move)

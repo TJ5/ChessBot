@@ -24,7 +24,8 @@ class BoardWrapper():
         return self.board.fen()
     def getboard(self):
         return self.board
-        
+    def isrepetition(self):
+        return self.board.is_repetition(5)
     #for testing only, given a string of every move, reset the board and push all of them
     def updateboardtest(self, moves: str):
         if(moves):

@@ -24,5 +24,5 @@ for event in client.bots.stream_incoming_events():
         id = event['game']['id'] 
         game = Game(client, id)
         game.start()    
-    print(threading.enumerate())
+    
         
