@@ -1,5 +1,6 @@
 from boardwrapper import BoardWrapper
 import chess
+from value import SquareValue
 class Bot():
     def __init__(self, piececolor: str):
         self.board = BoardWrapper()
@@ -42,3 +43,13 @@ class Bot():
     def getboard(self):
         return self.board.getboard()
     
+    def shalloweval(self):
+        eval = 0
+        i = 0
+        valfinder = SquareValue()
+        while (i < 64):
+            piece = self.board.getpiece(i)
+            if (piece):
+                eval = eval + valfinder.getpiecevalue(i, self.piececolor, piece)
+            i = i + 1
+        return eval
