@@ -28,7 +28,8 @@ class TestBot(unittest.TestCase):
 
         bot.updateboardtest("e2e4")
         self.assertEqual(bot.shalloweval(), -40)
-        
+        bot.updateboardtest("e2e4 g8f6")
+        self.assertEqual(bot.shalloweval(), 10)
     
     def test_game_init(self):
         self.assertEqual(current_state["type"], "gameFull")
