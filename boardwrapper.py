@@ -16,8 +16,8 @@ class BoardWrapper():
         return self
     
     #some helper methods
-    def getmove(self):
-        return next(self.board.generate_legal_moves())
+    def getmoves(self):
+        return self.board.legal_moves
     def getturn(self):
         return self.board.turn
     def getfen(self):
@@ -40,3 +40,11 @@ class BoardWrapper():
                 i+=1
                 
         return self
+
+    #pushes a move to the board stack
+    def pushmove(self, move : chess.Move):
+        self.board.push(move)
+        return chess.Board
+    def popmove(self):
+        return self.board.pop()
+

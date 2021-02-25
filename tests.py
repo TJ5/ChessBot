@@ -28,6 +28,8 @@ class TestBot(unittest.TestCase):
 
         bot.updateboardtest("e2e4")
         self.assertEqual(bot.shalloweval(), -40)
+        
+    
     def test_game_init(self):
         self.assertEqual(current_state["type"], "gameFull")
         self.assertEqual(current_state["white"]["id"], "whenchess")
