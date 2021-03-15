@@ -52,9 +52,10 @@ class TestBot(unittest.TestCase):
         self.assertTrue(chess.Move.from_uci(m.moves[1]))
     
     def test_movetree(self):
-        board = BoardWrapper(chess.Board("r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2P2N2/PP1P1PPP/RNBQK2R w KQkq - 1 5"))
-        tree = MoveTreeNode(board, 0, 3)
+        board = BoardWrapper(chess.Board(chess.STARTING_FEN))
+        tree = MoveTreeNode(board, 0, 2)
         print(tree)
+        print(str(tree.size()))
     
 
 unittest.main()

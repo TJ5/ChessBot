@@ -29,7 +29,20 @@ class MoveTreeNode():
                 
     def __str__(self):
         
-        ret = "\t"*self.movesahead + self.board.getfen() + "\n"
+        ret = "\t"*self.movesahead + str(self.board.getmovestack()) + "\n"
         for child in self.children:
             ret += child.__str__()
         return ret
+    
+    #returns number of leaf nodes 
+    def size(self):
+        counter = 0
+        #if leaf node - basecase
+        if (len(self.children) == 0):
+            return 1
+        else:
+            i = 0
+            while (i < len(self.children)):
+                counter = counter + self.children[i].size()
+                i = i + 1
+        return counter

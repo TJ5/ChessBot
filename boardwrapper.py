@@ -1,6 +1,7 @@
 import chess
 import re
 from value import SquareValue
+import copy
 class BoardWrapper():
     def __init__(self, board = chess.Board(chess.STARTING_FEN)):
         self.board : chess.Board = board
@@ -63,3 +64,5 @@ class BoardWrapper():
     
     def getmovestack(self):
         return self.board.move_stack
+    def getcopy(self):
+        return copy.copy(self)
