@@ -1,9 +1,10 @@
 import chess
 import re
+from value import SquareValue
 class BoardWrapper():
-    def __init__(self):
-        self.board = chess.Board(chess.STARTING_BOARD_FEN)
-        self.board.turn = chess.WHITE
+    def __init__(self, board = chess.Board(chess.STARTING_FEN)):
+        self.board : chess.Board = board
+        
     #given a string of every move, push the latest one to update the board
     def updateboard(self, moves: str):
         if(moves):
@@ -44,7 +45,21 @@ class BoardWrapper():
     #pushes a move to the board stack
     def pushmove(self, move : chess.Move):
         self.board.push(move)
-        return chess.Board
+        return self
     def popmove(self):
         return self.board.pop()
-
+    def shalloweval(self, piececolor):
+        eval = 0
+        i = 0
+        valfinder = SquareValue()
+        #loop through each square of the board
+        #If a piece exists, add it's value to the eval
+        while (i < 64):
+            piece = self.getpiece(i)
+            if (piece):
+                eval = eval + valfinder.getpiecevalue(i, piececolor, piece)
+            i = i + 1
+        return eval
+    
+    def getmovestack(self):
+        return self.board.move_stack

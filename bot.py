@@ -35,13 +35,17 @@ class Bot():
         if (self.board.getturn() == self.piececolor):
             moves : chess.LegalMoveGenerator = self.board.getmoves()
             moves = list(moves)
-            #ucimove = chess.Move.uci(moves[0])
+            
             i = 0
             currenteval = self.shalloweval()
             bestchange = -20000 #tracks best eval change from current state to candidate moves
             bestmove = None
+            
             while (i < len(moves)):
                 self.board.pushmove(moves[i])
+                
+                
+                
                 if ((self.shalloweval() - currenteval) > bestchange):
                     bestchange = self.shalloweval() - currenteval
                     bestmove = moves[i]
@@ -59,14 +63,4 @@ class Bot():
 
     #gets a heuristic evaluation of the board
     def shalloweval(self):
-        eval = 0
-        i = 0
-        valfinder = SquareValue()
-        #loop through each square of the board
-        #If a piece exists, add it's value to the eval
-        while (i < 64):
-            piece = self.board.getpiece(i)
-            if (piece):
-                eval = eval + valfinder.getpiecevalue(i, self.piececolor, piece)
-            i = i + 1
-        return eval
+        return self.board.shalloweval(self.piececolor)
