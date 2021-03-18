@@ -1,6 +1,6 @@
 from boardwrapper import BoardWrapper
 import chess
-from bot import Bot
+
 import copy
 class MoveTreeNode():
     #Move Tree node

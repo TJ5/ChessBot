@@ -1,9 +1,9 @@
 from boardwrapper import BoardWrapper
 import chess
-from value import SquareValue
+from movetree import MoveTreeNode
 class Bot():
     def __init__(self, piececolor: str):
-        self.board = BoardWrapper()
+        self.board = BoardWrapper(chess.Board(chess.STARTING_FEN))
         self.piececolor = piececolor
         if (self.piececolor == "white"):
             self.piececolor = chess.WHITE
@@ -33,26 +33,10 @@ class Bot():
         #return move if it is the bot's turn to play]
         #else, ignore
         if (self.board.getturn() == self.piececolor):
-            moves : chess.LegalMoveGenerator = self.board.getmoves()
-            moves = list(moves)
+            tree = MoveTreeNode(self.board, 0, 3, self.piececolor)
+            move = tree.getbestmove()
             
-            i = 0
-            currenteval = self.shalloweval()
-            bestchange = -20000 #tracks best eval change from current state to candidate moves
-            bestmove = None
-            
-            while (i < len(moves)):
-                self.board.pushmove(moves[i])
-                
-                
-                
-                if ((self.shalloweval() - currenteval) > bestchange):
-                    bestchange = self.shalloweval() - currenteval
-                    bestmove = moves[i]
-                self.board.popmove()
-                i = i + 1
-
-            return chess.Move.uci(bestmove)
+            return move
         else:
             return None
         

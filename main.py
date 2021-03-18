@@ -14,10 +14,10 @@ for event in client.bots.stream_incoming_events():
     #logic to filter out variants 
     if event['type'] == 'challenge':
         
-        if event['challenge']['challenger']['id'] == 'yeastape':
-            client.bots.accept_challenge(event['challenge']['id'])
-        else:
-            client.bots.decline_challenge(event['challenge']['id'])
+        #if event['challenge']['challenger']['id'] == 'yeastape':
+        client.bots.accept_challenge(event['challenge']['id'])
+        #else:
+        #   client.bots.decline_challenge(event['challenge']['id'])
         #Logic for when to accept/deny here
     elif event['type'] == 'gameStart':
         pass

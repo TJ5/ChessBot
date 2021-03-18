@@ -1,6 +1,6 @@
 import threading
 from bot import Bot
-
+import sys
 from mockclient import MockClient
 class Game(threading.Thread):
     def __init__(self, client, game_id, **kwargs):
@@ -38,7 +38,8 @@ class Game(threading.Thread):
 
                 game_running = self.handle_state_change(event)
                 if not (game_running):
-                    return
+
+                    sys.exit()
                 
             elif event['type'] == 'chatLine':
                 self.handle_chat_line(event)

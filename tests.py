@@ -13,7 +13,7 @@ current_state = game.current_state
 bot = Bot("black")
 value = SquareValue()
 class TestBot(unittest.TestCase):
-
+    
     def test_bot_movemaking(self): 
         bot.updateboardtest("e2e4 e7e5")
         move = bot.getmove()
@@ -53,9 +53,11 @@ class TestBot(unittest.TestCase):
     
     def test_movetree(self):
         board = BoardWrapper(chess.Board(chess.STARTING_FEN))
-        tree = MoveTreeNode(board, 0, 2)
-        print(tree)
-        print(str(tree.size()))
+        tree = MoveTreeNode(board, 0, 1, chess.WHITE)
+        self.assertEqual(tree.size(), 400)
+        
+        
+        
     
 
 unittest.main()
