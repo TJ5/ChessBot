@@ -4,7 +4,7 @@ class MockClient():
         self.falsestream = [
             {"type": "gameFull", "white": {"id": "whenchess", "name": "whenchess"}, "black": {"id": "opponent", "name": "opponent"}, "state": {"moves": "", "status": "started"}},
             {"type": "gameState", "moves": "e2e4 e7e5", "status": "started"},
-            {"type": "gameState", "moves": "e2e4 d7d5 e4d5 d8d5", "status": "started"},
+            {"type": "gameState", "moves": "e2e4 d7d5 e4d5 d8d5 b1c3 e7e6", "status": "started"},
             {"type": "gameState", "moves": "e2e4 e7e5 d1f3 g8c6 f1c4 d7d6 f3f7", "status": "mate", "winner": "white"}
         ]
         self.moves = []
@@ -19,4 +19,5 @@ class MockClient():
 
     def makemockmove(self, move: str):
         self.moves.append(move)
+        
         #self.falsestream.append({"type": "gameState", "moves": self.falsestream[len(self.falsestream) - 1]["moves"] + move, "status": self.status})
