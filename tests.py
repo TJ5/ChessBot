@@ -25,7 +25,7 @@ class TestBot(unittest.TestCase):
         self.assertTrue(m.moves[0])
         self.assertTrue(m.moves[1])
         self.assertEqual(m.moves[2], "c3d5")
-        print(m.moves)
+        
     def test_bot_movemaking(self): 
         self.bot.updateboardtest("e2e4 e7e5")
         move = self.bot.getmove()
@@ -53,12 +53,16 @@ class TestBot(unittest.TestCase):
         
     
     
-    #def test_movetree(self):
-    #    board = BoardWrapper(chess.Board(chess.STARTING_FEN))
-    #   tree = MoveTreeNode(board, 0, 2, chess.WHITE)
-    #    self.assertEqual(tree.size(), 400)
+    def test_movetree(self):
+        board = BoardWrapper(chess.Board(chess.STARTING_FEN))
+        tree = MoveTreeNode(board, 0, 2, chess.WHITE)
         
+           
+
         
+        self.assertEqual(tree.size(), 400)
+        
+    
         
     
 

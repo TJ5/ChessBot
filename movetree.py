@@ -31,7 +31,8 @@ class MoveTreeNode():
                 
     def __str__(self):
         
-        ret = "\t"*self.movesahead + str(self.board.getmovestack()) + "\n"
+        #ret = "\t"*self.movesahead + str(self.board.getmovestack()) + "\n"
+        ret = "\t"*self.movesahead + str(self.board.getmovestack())  + "\n"
         for child in self.children:
             ret += child.__str__()
         return ret
@@ -54,12 +55,14 @@ class MoveTreeNode():
         if (len(self.children) == 0):
             return self.board
         else:
+            
             if (self.movesahead % 2 == 0): 
                 i = 0
                 maxchild = None
                 maxeval = -20000
                 while (i < len(self.children)):
-                    if (self.children[i].getbestboard().shalloweval(self.piececolor) > maxeval):
+                    
+                    if (self.children[i].getbestboard().shalloweval(self.piececolor) >= maxeval):
                         maxeval = self.children[i].getbestboard().shalloweval(self.piececolor)
                         maxchild = self.children[i].getbestboard()
                     i = i + 1
@@ -69,7 +72,8 @@ class MoveTreeNode():
                 minchild = None
                 mineval = 20000
                 while (i < len(self.children)):
-                    if (self.children[i].getbestboard().shalloweval(self.piececolor) < mineval):
+                    
+                    if (self.children[i].getbestboard().shalloweval(self.piececolor) <= mineval):
                         mineval = self.children[i].getbestboard().shalloweval(self.piececolor)
                         minchild = self.children[i].getbestboard()
                     i = i + 1
@@ -77,7 +81,21 @@ class MoveTreeNode():
     def getbestmove(self):
         bestboard = self.getbestboard()
         movestack = bestboard.getmovestack()
-        #print(str(movestack))
-        move = movestack[-1 * self.maxdepth]
+        f = open("log.txt", "a")
+        f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
+        f.write("[EVAL AFTER MOVES]: " + str(bestboard.shalloweval(self.piececolor)))
+        f.write("[MOVES FROM " + str(self.maxdepth) + " DEPTH]: ")
+        i = len(self.board.getmovestack())
+        while (i < len(movestack)):
+            f.write(str(movestack[i]) + " ")
+            
+            i += 1
+        
+        f.write("\n\n")
+        
+        f.close()
+        
+
+        move = movestack[len(self.board.getmovestack())]
         
         return chess.Move.uci(move)

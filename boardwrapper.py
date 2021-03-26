@@ -55,11 +55,17 @@ class BoardWrapper():
         valfinder = SquareValue()
         #loop through each square of the board
         #If a piece exists, add it's value to the eval
-        while (i < 64):
-            piece = self.getpiece(i)
-            if (piece):
-                eval = eval + valfinder.getpiecevalue(i, piececolor, piece)
-            i = i + 1
+        if (self.board.is_checkmate()):
+            if (self.board.turn == piececolor):
+                eval = -20000
+            else:
+                eval = 20000
+        else:
+            while (i < 64):
+                piece = self.getpiece(i)
+                if (piece):
+                    eval = eval + valfinder.getpiecevalue(i, piececolor, piece)
+                i = i + 1
         return eval
     
     def getmovestack(self):
