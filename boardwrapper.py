@@ -60,6 +60,8 @@ class BoardWrapper():
                 eval = -20000
             else:
                 eval = 20000
+        elif (self.board.is_stalemate() or self.board.is_fivefold_repetition() or self.board.is_insufficient_material()):
+            eval = 0
         else:
             while (i < 64):
                 piece = self.getpiece(i)
