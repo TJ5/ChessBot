@@ -47,4 +47,4 @@ class Bot():
 
     #gets a heuristic evaluation of the board
     def shalloweval(self):
-        return self.board.shalloweval(self.piececolor)
+        return self.board.shalloweval(self.piececolor, False)

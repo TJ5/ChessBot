@@ -132,3 +132,4 @@ docs/
 lichess.token
 launch.json
 log.txt
+sandbox.py

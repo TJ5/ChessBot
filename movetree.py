@@ -11,9 +11,12 @@ class MoveTreeNode():
         self.maxdepth = maxdepth
         self.movesahead = movesahead
         self.piececolor = piececolor
-        
+        self.leaf = False
         if (movesahead < maxdepth):
             self.addchildren()
+        else: 
+            self.leaf = True
+        
     def addchildren(self):
         #To be optimized later
         #For now, add child boards for each legal board state that may occur
@@ -32,7 +35,15 @@ class MoveTreeNode():
     def __str__(self):
         
         #ret = "\t"*self.movesahead + str(self.board.getmovestack()) + "\n"
-        ret = "\t"*self.movesahead + str(self.board.getmovestack())  + "\n"
+        ret = ""
+        i = 0
+        moves = self.board.getmovestack()
+        while (i < len(moves)):
+            moves[i] = chess.Move.uci(moves[i])
+            i += 1
+        if (len(self.board.getmovestack())):
+            ret = "\t"*self.movesahead + str(moves)  + str(self.board.shalloweval(self.piececolor, self.leaf)) + "\n"
+        
         for child in self.children:
             ret += child.__str__()
         return ret
@@ -53,7 +64,9 @@ class MoveTreeNode():
     def getbestboard(self):
         #basecase
         if (len(self.children) == 0):
+            
             return self.board
+            
         else:
             
             if (self.movesahead % 2 == 0): 
@@ -61,29 +74,32 @@ class MoveTreeNode():
                 maxchild = None
                 maxeval = -20000
                 while (i < len(self.children)):
-                    
-                    if (self.children[i].getbestboard().shalloweval(self.piececolor) >= maxeval):
-                        maxeval = self.children[i].getbestboard().shalloweval(self.piececolor)
-                        maxchild = self.children[i].getbestboard()
+                    board = self.children[i].getbestboard()
+                    if (board.shalloweval(self.piececolor, True) >= maxeval):
+                        maxeval = board.shalloweval(self.piececolor, True)
+                        maxchild = board
                     i = i + 1
+                
                 return maxchild
             elif (self.movesahead % 2 == 1):
+                
                 i = 0
                 minchild = None
                 mineval = 20000
                 while (i < len(self.children)):
-                    
-                    if (self.children[i].getbestboard().shalloweval(self.piececolor) <= mineval):
-                        mineval = self.children[i].getbestboard().shalloweval(self.piececolor)
-                        minchild = self.children[i].getbestboard()
+                    board = self.children[i].getbestboard()
+                    if (board.shalloweval(self.piececolor, True) <= mineval):
+                        mineval = board.shalloweval(self.piececolor, True)
+                        minchild = board
                     i = i + 1
+                
                 return minchild
     def getbestmove(self):
         bestboard = self.getbestboard()
         movestack = bestboard.getmovestack()
         f = open("log.txt", "a")
         f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
-        f.write("[EVAL AFTER MOVES]: " + str(bestboard.shalloweval(self.piececolor)))
+        f.write("[EVAL AFTER MOVES]: " + str(bestboard.shalloweval(self.piececolor, True)))
         f.write("[MOVES FROM " + str(self.maxdepth) + " DEPTH]: ")
         i = len(self.board.getmovestack())
         while (i < len(movestack)):

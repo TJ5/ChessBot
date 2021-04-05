@@ -49,7 +49,7 @@ class BoardWrapper():
         return self
     def popmove(self):
         return self.board.pop()
-    def shalloweval(self, piececolor):
+    def shalloweval(self, piececolor, leaf_heuristic : bool):
         eval = 0
         i = 0
         valfinder = SquareValue()
@@ -66,7 +66,21 @@ class BoardWrapper():
             while (i < 64):
                 piece = self.getpiece(i)
                 if (piece):
-                    eval = eval + valfinder.getpiecevalue(i, piececolor, piece)
+                    value = valfinder.getpiecevalue(i, piececolor, piece)
+                    eval += value
+                    if (leaf_heuristic):
+                        if ((piece.piece_type > 1) and piece.piece_type < 6):
+                            if (piece.color == piececolor):
+                                attackers = list(self.board.attackers((not(piece.color)), chess.parse_square(chess.square_name(i))))
+                                
+                                j = 0
+                                while (j < len(attackers)):
+                                    att = abs(valfinder.getpiecevalue(attackers[j], piececolor, self.board.piece_at(attackers[j])))
+                                    if (abs(value - att) >= 100):
+                                        eval -= value
+                                        break
+                                    j += 1
+                    
                 i = i + 1
         return eval
     
