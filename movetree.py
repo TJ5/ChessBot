@@ -1,6 +1,6 @@
 from boardwrapper import BoardWrapper
 import chess
-
+import math
 import copy
 class MoveTreeNode():
     #Move Tree node
@@ -65,41 +65,40 @@ class MoveTreeNode():
                 i = i + 1
         return counter
 
-    def getbestboard(self):
+    def minimax(self, alpha : int, beta : int):
         #basecase
         if (len(self.children) == 0):
-            
             return self.board
             
         else:
-            
             if (self.movesahead % 2 == 0): 
-                i = 0
                 maxchild = None
                 maxeval = -20000
-                while (i < len(self.children)):
-                    board = self.children[i].getbestboard()
+                for i in self.children:
+                    board : BoardWrapper = i.getbestboard(alpha, beta)
                     if (board.shalloweval(self.piececolor) >= maxeval):
                         maxeval = board.shalloweval(self.piececolor)
                         maxchild = board
-                    i = i + 1
-                
+                    alpha = max(alpha, maxeval)
+                    if (alpha >= beta):
+                        break #prune branch
                 return maxchild
             elif (self.movesahead % 2 == 1):
-                
                 i = 0
                 minchild = None
                 mineval = 20000
-                while (i < len(self.children)):
-                    board = self.children[i].getbestboard()
+                for i in self.children:
+                    board : BoardWrapper = i.getbestboard(alpha, beta)
                     if (board.shalloweval(self.piececolor) <= mineval):
                         mineval = board.shalloweval(self.piececolor)
                         minchild = board
-                    i = i + 1
+                    beta = min(beta, mineval)
+                    if (beta <= alpha):
+                        break #prune branch
                 
                 return minchild
     def getbestmove(self):
-        bestboard = self.getbestboard()
+        bestboard : BoardWrapper = self.minimax(-math.inf, math.inf)
         movestack = bestboard.getmovestack()
         f = open("log.txt", "a")
         f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
