@@ -99,3 +99,28 @@ class BoardWrapper():
         return self.board.move_stack.copy()
     def getcopy(self):
         return copy.copy(self)
+    def getsortedmoves(self):
+        promotions = []
+        captures = []
+        others = []
+        valfinder = SquareValue()
+        moves = list(self.getmoves())
+        for i in moves:
+            attackedpiece = self.getpiece(i.to_square)
+            movedpiece = self.getpiece(i.from_square)
+            if (i.promotion):
+                promotions.append(i)
+            elif (attackedpiece):
+                if (attackedpiece.piece_type > 1 and attackedpiece.piece_type < 6):
+                    if (movedpiece.piece_type < attackedpiece.piece_type):
+                        captures.append(i)
+                    else:
+                        others.append(i)    
+                else:
+                    others.append(i)
+            else:
+                others.append(i)
+        sorted = promotions + captures + others
+        return sorted
+
+
