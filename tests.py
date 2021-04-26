@@ -53,11 +53,7 @@ class TestBot(unittest.TestCase):
         
     
     
-    def test_movetree(self):
-        board = BoardWrapper(chess.Board(chess.STARTING_FEN))
-        tree = MoveTreeNode(board, 0, 2, chess.WHITE)
-
-        self.assertEqual(tree.size(), 400)
+    
         
     
         

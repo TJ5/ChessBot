@@ -81,15 +81,16 @@ class BoardWrapper():
                     value = valfinder.getpiecevalue(i, piececolor, piece)
                     eval += value
                     if ((piece.piece_type > 1) and piece.piece_type < 6):
-                        if (piece.color == piececolor):
+                        if (piece.color != self.board.turn):
                             attackers = list(self.board.attackers((not(piece.color)), chess.parse_square(chess.square_name(i))))
                             
                             j = 0
                             while (j < len(attackers)):
                                 att = abs(valfinder.getpiecevalue(attackers[j], piececolor, self.board.piece_at(attackers[j])))
-                                if (abs(value - att) >= 100):
-                                    eval -= value
-                                    break
+                                if (value > att): 
+                                    if (abs(value - att) >= 100):
+                                        eval -= value
+                                        break
                                 j += 1
                     
                 i = i + 1

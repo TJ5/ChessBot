@@ -33,7 +33,7 @@ class Bot():
         #return move if it is the bot's turn to play]
         #else, ignore
         if (self.board.getturn() == self.piececolor):
-            tree = MoveTreeNode(self.board, 0, 3, self.piececolor)
+            tree = MoveTreeNode(self.board, 0, 4, self.piececolor)
             move = tree.getbestmove()
             
             return move
