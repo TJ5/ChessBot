@@ -35,7 +35,7 @@ class BoardWrapper():
     def getpiece(self, square):
         return self.board.piece_at(square)
     #for testing only, given a string of every move, reset the board and push all of them
-    def updateboardtest(self, moves: str):
+    def updateboardall(self, moves: str):
         if(moves):
             moves = moves.strip()
             self.board.reset()
@@ -66,11 +66,10 @@ class BoardWrapper():
         #If a piece exists, add it's value to the eval
         outcome = self.board.outcome(claim_draw = False)
         if (outcome):
-            if (outcome.winner):
-                if (outcome.winner == piececolor): #bot wins
-                    eval = 20000
-                else: #opponent wins
-                    eval = -20000
+            if (outcome.winner == piececolor): #bot wins
+                eval = 20000
+            elif (outcome.winner == (not piececolor)): #opponent wins
+                eval = -20000
             else:
                 eval = 0
         else:
@@ -87,7 +86,7 @@ class BoardWrapper():
                             j = 0
                             while (j < len(attackers)):
                                 att = abs(valfinder.getpiecevalue(attackers[j], piececolor, self.board.piece_at(attackers[j])))
-                                if (value > att): 
+                                if (abs(value) > att): 
                                     if (abs(value - att) >= 100):
                                         eval -= value
                                         break

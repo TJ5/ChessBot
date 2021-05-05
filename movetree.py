@@ -1,7 +1,7 @@
 from boardwrapper import BoardWrapper
 import chess
 import math
-import copy
+import time
 class MoveTreeNode():
     #Move Tree node
     def __init__(self, board: BoardWrapper, movesahead: int, maxdepth: int, piececolor):
@@ -17,7 +17,7 @@ class MoveTreeNode():
         
     def addchildren(self, alpha, beta):
         moves = self.board.getsortedmoves() 
-
+        #moves = list(self.board.getmoves())
         
         #if (childboard.drawable()):
         #    drawboard = BoardWrapper(chess.Board, True)
@@ -38,9 +38,15 @@ class MoveTreeNode():
                     childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor)
                     self.children.append(childnode)
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
-                    if (board.shalloweval(self.piececolor) >= maxeval):
+                    eval = board.shalloweval(self.piececolor)
+                    if (eval > maxeval):
                         maxeval = board.shalloweval(self.piececolor)
                         maxchild = board
+                    elif (eval == maxeval):
+                        if (len(board.getmovestack()) < len(maxchild.getmovestack())):
+                            maxchild = board
+                        else:
+                            pass
                     alpha = max(alpha, maxeval)
                     if (alpha > beta):
                         break #prune branch
@@ -56,9 +62,15 @@ class MoveTreeNode():
                     childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor)
                     self.children.append(childnode)
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
-                    if (board.shalloweval(self.piececolor) <= mineval):
+                    eval = board.shalloweval(self.piececolor)
+                    if (eval < mineval):
                         mineval = board.shalloweval(self.piececolor)
                         minchild = board
+                    elif (eval == mineval): #if the two evaluations are the same, favor the board with a shorter movestack, if applicable
+                        if (len(board.getmovestack()) < len(minchild.getmovestack())):
+                            minchild = board
+                        else:
+                            pass
                     beta = min(beta, mineval)
                     if (beta < alpha):
                         break #prune branch
@@ -99,9 +111,14 @@ class MoveTreeNode():
     
         
     def getbestmove(self):
+        now = time.time()
         bestboard : BoardWrapper = self.addchildren((-1 * math.inf), math.inf)
+        t = time.time() - now
+        s = self.size()
         movestack = bestboard.getmovestack()
         f = open("log.txt", "a")
+        f.write("[TIME THIS MOVE]: " + str(t) + " [TIME PER NODE]: " + str(t/s) + "\n")
+        f.write("[LEAVES SEARCHED]: " + str(s) + "\n")
         f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
         f.write("[EVAL AFTER MOVES]: " + str(bestboard.shalloweval(self.piececolor)))
         f.write("[MOVES FROM " + str(self.maxdepth) + " DEPTH]: ")

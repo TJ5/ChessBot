@@ -2,8 +2,8 @@ from boardwrapper import BoardWrapper
 import chess
 from movetree import MoveTreeNode
 class Bot():
-    def __init__(self, piececolor: str):
-        self.board = BoardWrapper(chess.Board(chess.STARTING_FEN))
+    def __init__(self, piececolor: str, fen = chess.STARTING_FEN):
+        self.board = BoardWrapper(chess.Board(fen))
         self.piececolor = piececolor
         if (self.piececolor == "white"):
             self.piececolor = chess.WHITE
@@ -21,8 +21,8 @@ class Bot():
         
     #resets board, then makes every move in the provided move string
     #for testing purposes, for inputting an arbitrary position
-    def updateboardtest(self, moves: str):
-        self.board = self.board.updateboardtest(moves)
+    def updateboardall(self, moves: str):
+        self.board = self.board.updateboardall(moves)
         #check if it is the bot's turn to play, if so, return move
         if (self.board.isrepetition()):
             return None

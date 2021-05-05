@@ -27,10 +27,10 @@ class TestBot(unittest.TestCase):
         self.assertEqual(m.moves[2], "c3d5")
         
     def test_bot_movemaking(self): 
-        self.bot.updateboardtest("e2e4 e7e5")
+        self.bot.updateboardall("e2e4 e7e5")
         move = self.bot.getmove()
         self.assertFalse(move)
-        self.bot.updateboardtest("e2e4 e7e5 g1f3")
+        self.bot.updateboardall("e2e4 e7e5 g1f3")
         move = self.bot.getmove()
         testboard = chess.Board("rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2")
         self.assertTrue(chess.Move.from_uci(move) in testboard.legal_moves)
@@ -40,13 +40,13 @@ class TestBot(unittest.TestCase):
         self.assertEqual(self.value.getpawnmodifier(chess.E4, chess.WHITE), 20)
         self.assertEqual(self.value.getpawnmodifier(chess.E2, chess.BLACK), 50)
      
-        self.bot.updateboardtest("e2e4")
+        self.bot.updateboardall("e2e4")
         self.assertEqual(self.bot.shalloweval(), -40)
     def test_knight_eval(self):
-        self.bot.updateboardtest("e2e4 g8f6")
+        self.bot.updateboardall("e2e4 g8f6")
         self.assertEqual(self.bot.shalloweval(), 10)
     def test_bishop_eval(self):
-        self.bot.updateboardtest("e2e4 e7e5 f1c4")
+        self.bot.updateboardall("e2e4 e7e5 f1c4")
         self.assertEqual(self.bot.shalloweval(), -20)
     
         

@@ -3,7 +3,7 @@ from bot import Bot
 import sys
 from mockclient import MockClient
 class Game(threading.Thread):
-    def __init__(self, client, game_id, **kwargs):
+    def __init__(self, client, game_id, fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", **kwargs):
         super().__init__(**kwargs)
         self.game_id = game_id
         self.client = client
@@ -24,7 +24,7 @@ class Game(threading.Thread):
             self.botpieces = "black"
             
         #intialize a bot object to pass board state to
-        self.bot = Bot(self.botpieces)
+        self.bot = Bot(self.botpieces, fen)
     
     
     def run(self):
@@ -55,7 +55,7 @@ class Game(threading.Thread):
             
             #if test mode, support inputting an arbitrary position
             if (self.test_mode):
-                gamecont = self.bot.updateboardtest(game_state["moves"])
+                gamecont = self.bot.updateboardall(game_state["moves"])
                 
             else:
                 gamecont = self.bot.updateboard(game_state["moves"])
