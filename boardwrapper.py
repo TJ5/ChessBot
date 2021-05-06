@@ -87,7 +87,7 @@ class BoardWrapper():
                             while (j < len(attackers)):
                                 att = abs(valfinder.getpiecevalue(attackers[j], piececolor, self.board.piece_at(attackers[j])))
                                 if (abs(value) > att): 
-                                    if (abs(value - att) >= 100):
+                                    if (abs(value) - abs(att) >= 100):
                                         eval -= value
                                         break
                                 j += 1
