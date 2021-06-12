@@ -4,14 +4,14 @@ import math
 import time
 class MoveTreeNode():
     #Move Tree node
-    def __init__(self, board: BoardWrapper, movesahead: int, maxdepth: int, piececolor):
+    def __init__(self, board: BoardWrapper, movesahead: int, maxdepth: int, piececolor, e):
         
         self.board = board.getcopy()
         self.children = []
         self.maxdepth = maxdepth
         self.movesahead = movesahead
         self.piececolor = piececolor
-        
+        self.e = e
         
         
         
@@ -32,10 +32,10 @@ class MoveTreeNode():
                 maxchild = None
                 maxeval = (-1 * math.inf)
                 for i in moves:
-                    childboard = BoardWrapper()
+                    childboard = BoardWrapper(self.e)
                     childboard.board = self.board.board.copy() 
                     childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor)
+                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
                     self.children.append(childnode)
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
@@ -56,10 +56,10 @@ class MoveTreeNode():
                 minchild = None
                 mineval = math.inf
                 for i in moves:
-                    childboard = BoardWrapper()
+                    childboard = BoardWrapper(self.e)
                     childboard.board = self.board.board.copy() 
                     childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor)
+                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
                     self.children.append(childnode)
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
@@ -115,11 +115,13 @@ class MoveTreeNode():
         bestboard : BoardWrapper = self.addchildren((-1 * math.inf), math.inf)
         t = time.time() - now
         s = self.size()
+        is_endgame : bool = bestboard.is_endgame()
         movestack = bestboard.getmovestack()
         f = open("log.txt", "a")
         f.write("[TIME THIS MOVE]: " + str(t) + " [TIME PER NODE]: " + str(t/s) + "\n")
         f.write("[LEAVES SEARCHED]: " + str(s) + "\n")
         f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
+        f.write("[IS ENDGAME]: " + str(is_endgame) + "\n")
         f.write("[EVAL AFTER MOVES]: " + str(bestboard.shalloweval(self.piececolor)))
         f.write("[MOVES FROM " + str(self.maxdepth) + " DEPTH]: ")
         i = len(self.board.getmovestack())

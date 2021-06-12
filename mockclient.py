@@ -1,4 +1,5 @@
 from boardwrapper import BoardWrapper
+from endgame import EndgamePredictor
 class MockClient():
     def __init__(self):
         self.falsestream = [
@@ -9,7 +10,7 @@ class MockClient():
         ]
         self.moves = []
         #self.streamcounter = 0
-        self.board = BoardWrapper()
+        self.board = BoardWrapper(EndgamePredictor())
     def stream(self):
         #yield self.falsestream[self.streamcounter]
         #self.streamcounter+=1

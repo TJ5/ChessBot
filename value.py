@@ -118,7 +118,7 @@ class SquareValue():
         else:
             return self.kingendgametable[chess.square_mirror(square)]
 
-    def getpiecevalue(self, square:chess.Square, color: chess.Color, piece: chess.Piece):
+    def getpiecevalue(self, square:chess.Square, color: chess.Color, piece: chess.Piece, is_endgame : bool, use_table : bool = True):
         val = 0
         
         #default piece values
@@ -137,28 +137,29 @@ class SquareValue():
             modifier = -1
         
         #add modifiers based on what square the pawn is on
-        if (piece.piece_type == chess.PAWN):
-            val = pawn
-            val = val + self.getpawnmodifier(square, piece.color)
-        elif (piece.piece_type == chess.KNIGHT):
-            val = knight
-            val = val + self.getknightmodifier(square, piece.color)
-        elif (piece.piece_type == chess.BISHOP):
-            val = bishop
-            val = val + self.getbishopmodifier(square, piece.color)
-        elif (piece.piece_type == chess.ROOK):
-            val = rook
-            val = val + self.getrookmodifier(square, piece.color)
-        elif (piece.piece_type == chess.QUEEN):
-            val = queen
-            val = val + self.getqueenmodifier(square, piece.color)
-        elif (piece.piece_type == chess.KING):
-            val = king
-            endgame = False #Implement logic for if endgame or not later
-            if (endgame):
-                val = val + self.getkingendmodifier(square, piece.color)
-            else:
-                val = val + self.getkingmodifier(square, piece.color)
+        if (use_table):
+            if (piece.piece_type == chess.PAWN):
+                val = pawn
+                val = val + self.getpawnmodifier(square, piece.color)
+            elif (piece.piece_type == chess.KNIGHT):
+                val = knight
+                val = val + self.getknightmodifier(square, piece.color)
+            elif (piece.piece_type == chess.BISHOP):
+                val = bishop
+                val = val + self.getbishopmodifier(square, piece.color)
+            elif (piece.piece_type == chess.ROOK):
+                val = rook
+                val = val + self.getrookmodifier(square, piece.color)
+            elif (piece.piece_type == chess.QUEEN):
+                val = queen
+                val = val + self.getqueenmodifier(square, piece.color)
+            elif (piece.piece_type == chess.KING):
+                val = king
+                
+                if (is_endgame):
+                    val = val + self.getkingendmodifier(square, piece.color)
+                else:
+                    val = val + self.getkingmodifier(square, piece.color)
 
         #If it isn't a pawn, ignore for now
         else:

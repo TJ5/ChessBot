@@ -2,11 +2,14 @@ import chess
 import re
 from value import SquareValue
 import copy
+
+
+import numpy as np
 class BoardWrapper():
-    def __init__(self, board = chess.Board(chess.STARTING_FEN), drawclaimed = False):
+    def __init__(self, e, board = chess.Board(chess.STARTING_FEN), drawclaimed = False):
         self.board : chess.Board = board
         self.draw = drawclaimed
-        
+        self.e = e
     #given a string of every move, push the latest one to update the board
     def updateboard(self, moves: str):
         if(moves):
@@ -60,7 +63,7 @@ class BoardWrapper():
             return 0
         
         eval = 0
-        
+        is_endgame = self.e.is_endgame(self.getfen())
         valfinder = SquareValue()
         #loop through each square of the board
         #If a piece exists, add it's value to the eval
@@ -77,15 +80,18 @@ class BoardWrapper():
             while (i < 64):
                 piece = self.getpiece(i)
                 if (piece):
-                    value = valfinder.getpiecevalue(i, piececolor, piece)
+                    value = valfinder.getpiecevalue(i, piececolor, piece, is_endgame)
                     eval += value
                     if ((piece.piece_type > 1) and piece.piece_type < 6):
                         if (piece.color != self.board.turn):
                             attackers = list(self.board.attackers((not(piece.color)), chess.parse_square(chess.square_name(i))))
-                            
+                            #defenders = list(self.board.attackers((piece.color), chess.parse_square(chess.square_name(i))))
                             j = 0
                             while (j < len(attackers)):
-                                att = abs(valfinder.getpiecevalue(attackers[j], piececolor, self.board.piece_at(attackers[j])))
+                                #if len(defenders) == 0:
+                                #    eval -= value
+                                #    break
+                                att = abs(valfinder.getpiecevalue(attackers[j], piececolor, self.board.piece_at(attackers[j]), is_endgame))
                                 if (abs(value) > att): 
                                     if (abs(value) - abs(att) >= 100):
                                         eval -= value
@@ -103,7 +109,7 @@ class BoardWrapper():
         promotions = []
         captures = []
         others = []
-        valfinder = SquareValue()
+        
         moves = list(self.getmoves())
         for i in moves:
             attackedpiece = self.getpiece(i.to_square)
@@ -122,5 +128,7 @@ class BoardWrapper():
                 others.append(i)
         sorted = promotions + captures + others
         return sorted
-
-
+    
+    
+    def is_endgame(self):
+        return self.e.is_endgame(self.getfen())

@@ -1,14 +1,17 @@
 from boardwrapper import BoardWrapper
 import chess
 from movetree import MoveTreeNode
+from endgame import EndgamePredictor
 class Bot():
     def __init__(self, piececolor: str, fen = chess.STARTING_FEN):
-        self.board = BoardWrapper(chess.Board(fen))
+        self.e = EndgamePredictor()
+        self.board = BoardWrapper(self.e, chess.Board(fen))
         self.piececolor = piececolor
         if (self.piececolor == "white"):
             self.piececolor = chess.WHITE
         else:
             self.piececolor = chess.BLACK
+        
     #updates board representing game state and returns move to make, if applicable
     def updateboard(self, moves: str):
         self.board = self.board.updateboard(moves)
@@ -33,7 +36,7 @@ class Bot():
         #return move if it is the bot's turn to play]
         #else, ignore
         if (self.board.getturn() == self.piececolor):
-            tree = MoveTreeNode(self.board, 0, 4, self.piececolor)
+            tree = MoveTreeNode(self.board, 0, 4, self.piececolor, self.e)
             move = tree.getbestmove()
             
             return move
