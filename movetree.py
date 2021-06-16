@@ -16,6 +16,7 @@ class MoveTreeNode():
         
         
     def addchildren(self, alpha, beta):
+        
         moves = self.board.getsortedmoves() 
         #moves = list(self.board.getmoves())
         
@@ -31,12 +32,18 @@ class MoveTreeNode():
             if (self.movesahead % 2 == 0): 
                 maxchild = None
                 maxeval = (-1 * math.inf)
-                for i in moves:
-                    childboard = BoardWrapper(self.e)
-                    childboard.board = self.board.board.copy() 
-                    childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
-                    self.children.append(childnode)
+                i = 0
+                new_node : bool = None
+                while i < len(moves):
+                    if (len(self.children) == 0 or (new_node == True)):
+                        childboard = BoardWrapper(self.e)
+                        childboard.board = self.board.board.copy() 
+                        childboard.pushmove(moves[i])
+                        childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
+                        self.children.append(childnode)
+                        new_node = True
+                    else:
+                        childnode = self.children[i]
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
                     if (eval > maxeval):
@@ -50,17 +57,26 @@ class MoveTreeNode():
                     alpha = max(alpha, maxeval)
                     if (alpha > beta):
                         break #prune branch
+                    i += 1
                 return maxchild
             elif (self.movesahead % 2 == 1):
                 i = 0
                 minchild = None
                 mineval = math.inf
-                for i in moves:
-                    childboard = BoardWrapper(self.e)
-                    childboard.board = self.board.board.copy() 
-                    childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
-                    self.children.append(childnode)
+                i = 0
+                #if the node has been generated in a past movetree, we do not need to generate its children if they already exist
+                #if the node has no children, new_node becomes True and children are generated
+                new_node : bool = None
+                while i < len(moves):
+                    if (len(self.children) == 0 or (new_node == True)):
+                        childboard = BoardWrapper(self.e)
+                        childboard.board = self.board.board.copy() 
+                        childboard.pushmove(moves[i])
+                        childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
+                        self.children.append(childnode)
+                        new_node = True
+                    else:
+                        childnode = self.children[i]
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
                     if (eval < mineval):
@@ -74,7 +90,7 @@ class MoveTreeNode():
                     beta = min(beta, mineval)
                     if (beta < alpha):
                         break #prune branch
-                
+                    i += 1
                 return minchild
                 
     def __str__(self):
