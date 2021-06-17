@@ -43,6 +43,8 @@ class MoveTreeNode():
                         self.children.append(childnode)
                         new_node = True
                     else:
+                        if len(self.children) == i:
+                            break
                         childnode = self.children[i]
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
@@ -76,6 +78,8 @@ class MoveTreeNode():
                         self.children.append(childnode)
                         new_node = True
                     else:
+                        if len(self.children) == i:
+                            break
                         childnode = self.children[i]
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
@@ -154,3 +158,8 @@ class MoveTreeNode():
         move = movestack[len(self.board.getmovestack())]
         
         return chess.Move.uci(move)
+
+    def shift_depth(self, depth):
+        self.movesahead = depth
+        for i in self.children:
+            i.shift_depth(depth + 1)

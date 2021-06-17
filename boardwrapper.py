@@ -27,6 +27,7 @@ class BoardWrapper():
             return self.board.legal_moves
         else:
             return []
+    
     def getturn(self):
         return self.board.turn
     def getfen(self):

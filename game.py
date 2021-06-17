@@ -7,7 +7,7 @@ class Game(threading.Thread):
         super().__init__(**kwargs)
         self.game_id = game_id
         self.client = client
-
+        self.starting_fen = fen
         #set stream to test stream or lichess stream
         #initialize test_mode var to know where to make moves
         if (isinstance(client, MockClient)):
@@ -25,7 +25,7 @@ class Game(threading.Thread):
             
         #intialize a bot object to pass board state to
         self.bot = Bot(self.botpieces, fen)
-    
+        
     
     def run(self):
         #play the first move if white
