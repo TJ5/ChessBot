@@ -17,7 +17,14 @@ class MoveTreeNode():
         
     def addchildren(self, alpha, beta):
         moves = self.board.getsortedmoves() 
-        #moves = list(self.board.getmoves())
+        i = 0
+
+        #remove moves which already exist in the tree
+        for k in self.children:
+            while i < len(moves):
+                if k.board.getmovestack()[-1] == i:
+                    moves.pop(i)
+                i += 1
         
         #if (childboard.drawable()):
         #    drawboard = BoardWrapper(chess.Board, True)
@@ -26,18 +33,27 @@ class MoveTreeNode():
         
         if (len(moves) == 0 or self.movesahead == self.maxdepth):
             return self.board
-            
+        
         else:
+            k = len(self.children)
+            i = 0
+            j = len(moves)
             if (self.movesahead % 2 == 0): 
                 maxchild = None
                 maxeval = (-1 * math.inf)
-                for i in moves:
-                    childboard = BoardWrapper(self.e)
-                    childboard.board = self.board.board.copy() 
-                    childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
-                    self.children.append(childnode)
+                while (i < (k + j)):
+                    if (i < len(moves)):
+                        childboard = BoardWrapper(self.e)
+                        childboard.board = self.board.board.copy() 
+                        childboard.pushmove(moves[i])
+                        childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
+                        self.children.append(childnode)
+                        
+                    else:
+                        childnode = self.children[i - j]
+
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
+
                     eval = board.shalloweval(self.piececolor)
                     if (eval > maxeval):
                         maxeval = board.shalloweval(self.piececolor)
@@ -50,18 +66,25 @@ class MoveTreeNode():
                     alpha = max(alpha, maxeval)
                     if (alpha > beta):
                         break #prune branch
+                    i += 1
                 return maxchild
             elif (self.movesahead % 2 == 1):
                 i = 0
                 minchild = None
                 mineval = math.inf
-                for i in moves:
-                    childboard = BoardWrapper(self.e)
-                    childboard.board = self.board.board.copy() 
-                    childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
-                    self.children.append(childnode)
+                while (i < (k + j)):
+                    if (i < len(moves)):
+                        childboard = BoardWrapper(self.e)
+                        childboard.board = self.board.board.copy() 
+                        childboard.pushmove(moves[i])
+                        childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
+                        self.children.append(childnode)
+                        
+                    else:
+                        childnode = self.children[i - j]
+
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
+
                     eval = board.shalloweval(self.piececolor)
                     if (eval < mineval):
                         mineval = board.shalloweval(self.piececolor)
@@ -74,7 +97,7 @@ class MoveTreeNode():
                     beta = min(beta, mineval)
                     if (beta < alpha):
                         break #prune branch
-                
+                    i += 1
                 return minchild
                 
     def __str__(self):
@@ -138,3 +161,13 @@ class MoveTreeNode():
         move = movestack[len(self.board.getmovestack())]
         
         return chess.Move.uci(move)
+
+    def shift_depth(self, depth):
+        self.movesahead = depth
+        for i in self.children:
+            i.shift_depth(depth + 1)
+
+    def shift_max_depth(self, max):
+        self.maxdepth = max
+        for i in self.children:
+            i.shift_max_depth(max)

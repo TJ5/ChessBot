@@ -6,7 +6,7 @@ from bot import Bot
 from value import SquareValue
 from movetree import MoveTreeNode
 from boardwrapper import BoardWrapper
-
+from endgame import EndgamePredictor
 class TestBot(unittest.TestCase):
     def setUp(self) -> None:
         
@@ -49,8 +49,16 @@ class TestBot(unittest.TestCase):
         self.bot.updateboardall("e2e4 e7e5 f1c4")
         self.assertEqual(self.bot.shalloweval(), -20)
     
-        
-        
+
+    def test_tree_recycle(self):
+        e = EndgamePredictor()
+        bw = BoardWrapper(e, chess.Board("R6R/1r3pp1/6kp/3pPp2/1r2q1P1/7P/1P1Q3K/8 w - - 0 1"))
+        tree = MoveTreeNode(bw, 0, 2, chess.WHITE, e)
+        tree.getbestmove()
+        tree.shift_depth(0)
+        tree.shift_max_depth(4)
+        move = tree.getbestmove()
+        self.assertEqual(move, "d2h6")
     
     
     
