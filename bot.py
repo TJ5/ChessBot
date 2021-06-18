@@ -7,8 +7,12 @@ class Bot():
         self.e = EndgamePredictor()
         self.board = BoardWrapper(self.e, chess.Board(fen))
         self.piececolor = piececolor
+        self.tree = None
         if (self.piececolor == "white"):
             self.piececolor = chess.WHITE
+            tboard = BoardWrapper(self.e)
+            tboard.board = self.board.board.copy()
+            self.tree = MoveTreeNode(tboard, 0, 4, chess.WHITE, self.e)
         else:
             self.piececolor = chess.BLACK
         
@@ -36,9 +40,28 @@ class Bot():
         #return move if it is the bot's turn to play]
         #else, ignore
         if (self.board.getturn() == self.piececolor):
-            tree = MoveTreeNode(self.board, 0, 4, self.piececolor, self.e)
-            move = tree.getbestmove()
-            
+            if (not(self.tree)):
+                # construct tree if bot plays black on its first move
+                self.tree = MoveTreeNode(self.board, 0, 4, chess.BLACK, self.e)
+            else:
+                move_stack = self.board.getmovestack() 
+                if (len(move_stack) > 0):
+                    bot_move = move_stack[-2]
+                    opponent_move = move_stack[-1]
+                    for i in self.tree.children:
+                        if (i.board.getmovestack()[-1] == bot_move):
+                            for j in i.children:
+                                if (j.board.getmovestack()[-1] == opponent_move):
+                                    self.tree = j
+                                    self.tree.shift_depth(0)
+                                    move = self.tree.getbestmove()
+                                    return move
+                    #a working tree exists, but the current board position is not in it
+                    tree_board = BoardWrapper(self.e)
+                    tree_board.board = self.board.board.copy()
+                    self.tree = MoveTreeNode(tree_board, 0, 4, self.piececolor, self.e)
+                        
+            move = self.tree.getbestmove()
             return move
         else:
             return None
