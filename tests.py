@@ -1,3 +1,4 @@
+from endgame import EndgamePredictor
 import unittest
 from game import Game
 import chess
@@ -6,7 +7,8 @@ from bot import Bot
 from value import SquareValue
 from movetree import MoveTreeNode
 from boardwrapper import BoardWrapper
-
+from table import TTable
+import math
 class TestBot(unittest.TestCase):
     def setUp(self) -> None:
         
@@ -50,13 +52,17 @@ class TestBot(unittest.TestCase):
         self.assertEqual(self.bot.shalloweval(), -20)
     
         
-        
+    def test_table(self):
+        t = TTable()
+        e = EndgamePredictor()
+        b = BoardWrapper(e)
+        tree = MoveTreeNode(b, 0, 4, chess.WHITE, e)
+        bestboard = tree.addchildren((-1 * math.inf), math.inf)
+        t.put(b.board, chess.Move.uci(bestboard.getmovestack()[0]), bestboard.shalloweval(chess.WHITE), 0, 4)
+        self.assertEqual(t.table[5060803636482931868], ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'g1f3', 0, 0, 4])
+        self.assertEqual(t.get(b.board), ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'g1f3', 0, 0, 4])
     
-    
-    
-        
-    
-        
+         
     
 
 unittest.main()
