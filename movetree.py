@@ -45,54 +45,34 @@ class MoveTreeNode():
             return self.board
             
         else:
-            if (self.movesahead % 2 == 0): 
-                maxchild = None
-                maxeval = (-1 * math.inf)
-                for i in moves:
-                    childboard = BoardWrapper(self.e)
-                    childboard.board = self.board.board.copy() 
-                    childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
-                    self.children.append(childnode)
-                    board : BoardWrapper = childnode.addchildren(alpha, beta)
-                    eval = board.shalloweval(self.piececolor)
-                    if (eval > maxeval):
-                        maxeval = board.shalloweval(self.piececolor)
-                        maxchild = board
-                    elif (eval == maxeval):
-                        if (len(board.getmovestack()) < len(maxchild.getmovestack())):
-                            maxchild = board
-                        else:
-                            pass
-                    alpha = max(alpha, maxeval)
-                    if (alpha > beta):
-                        break #prune branch
-                return maxchild
-            elif (self.movesahead % 2 == 1):
-                i = 0
-                minchild = None
-                mineval = math.inf
-                for i in moves:
-                    childboard = BoardWrapper(self.e)
-                    childboard.board = self.board.board.copy() 
-                    childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
-                    self.children.append(childnode)
-                    board : BoardWrapper = childnode.addchildren(alpha, beta)
-                    eval = board.shalloweval(self.piececolor)
-                    if (eval < mineval):
-                        mineval = board.shalloweval(self.piececolor)
-                        minchild = board
-                    elif (eval == mineval): #if the two evaluations are the same, favor the board with a shorter movestack, if applicable
-                        if (len(board.getmovestack()) < len(minchild.getmovestack())):
-                            minchild = board
-                        else:
-                            pass
-                    beta = min(beta, mineval)
-                    if (beta < alpha):
-                        break #prune branch
+            
+            best_child = None
+            best_eval = (-1 * math.inf) if self.movesahead % 2 == 0 else math.inf
+            for i in moves:
+                childboard = BoardWrapper(self.e)
+                childboard.board = self.board.board.copy() 
+                childboard.pushmove(i)
+                childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
+                self.children.append(childnode)
+                board : BoardWrapper = childnode.addchildren(alpha, beta)
+                eval = board.shalloweval(self.piececolor)
+                if (self.movesahead % 2 == 0 and eval > best_eval) or (self.movesahead % 2 == 1 and eval < best_eval):
+                    best_eval = eval
+                    best_child = board
+                elif (eval == best_eval):
+                    if (len(board.getmovestack()) < len(best_child.getmovestack())):
+                        best_child = board
+                    else:
+                        pass
+                if (self.movesahead % 2 == 0):
+                    alpha = max(alpha, best_eval)
+                else:
+                    beta = min(beta, best_eval)
+                if (alpha >= beta):
+                    break #prune branch
                 
-                return minchild
+            return best_child
+            
                 
     def __str__(self):
         
