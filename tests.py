@@ -58,11 +58,20 @@ class TestBot(unittest.TestCase):
         b = BoardWrapper(e)
         tree = MoveTreeNode(b, 0, 4, chess.WHITE, e)
         bestboard = tree.addchildren((-1 * math.inf), math.inf)
-        t.put(b.board, chess.Move.uci(bestboard.getmovestack()[0]), bestboard.shalloweval(chess.WHITE), 0, 4)
-        self.assertEqual(t.table[5060803636482931868], ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'g1f3', 0, 0, 4])
-        self.assertEqual(t.get(b.board), ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'g1f3', 0, 0, 4])
+        t.put(b.board,bestboard.getmovestack(), bestboard.shalloweval(chess.WHITE), 0, 4)
+        self.assertEqual(t.table[5060803636482931868], ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', [chess.Move.from_uci('g1f3'), chess.Move.from_uci('g8f6'), chess.Move.from_uci('b1c3'), chess.Move.from_uci('b8c6')], 0, 0, 4])
+        self.assertEqual(t.get(b.board)[1][0], chess.Move.from_uci('g1f3'))
     
          
-    
-
+    def test_tree_table_lookup(self):
+        t = TTable()
+        e = EndgamePredictor()
+        b = BoardWrapper(e)
+        tree = MoveTreeNode(b, 0, 4, chess.WHITE, e, t)
+        lookup = BoardWrapper(e, chess.Board("rnbqkbnr/pppppppp/8/8/8/2N5/PPPPPPPP/R1BQKBNR b KQkq - 1 1"))
+        t.put(lookup.board, [chess.Move.from_uci('b1c3'), chess.Move.from_uci('g8f6'), chess.Move.from_uci('g1f3'), chess.Move.from_uci('b8c6')], 0, 0, 3)
+        tree.getbestmove()
+        s = tree.size()
+        print(str(s))
+        self.assertLess(s, 3346)
 unittest.main()

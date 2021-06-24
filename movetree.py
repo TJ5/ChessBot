@@ -2,9 +2,10 @@ from boardwrapper import BoardWrapper
 import chess
 import math
 import time
+from table import TTable
 class MoveTreeNode():
     #Move Tree node
-    def __init__(self, board: BoardWrapper, movesahead: int, maxdepth: int, piececolor, e):
+    def __init__(self, board: BoardWrapper, movesahead: int, maxdepth: int, piececolor, e, *args):
         
         self.board = board.getcopy()
         self.children = []
@@ -13,11 +14,27 @@ class MoveTreeNode():
         self.piececolor = piececolor
         self.e = e
         
+        if args:
+            self.TTable = args[0]
+        else:
+            self.TTable = TTable()
         
         
     def addchildren(self, alpha, beta):
+        table_lookup = self.TTable.get(self.board.board)
+        if table_lookup:
+            #position found in hash table
+            if table_lookup[0] == self.board.getfen():
+                if table_lookup[4] >= (self.maxdepth - self.movesahead):
+                    bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
+                    i = table_lookup[4]
+                    while i > 0:
+                        bestboard.pushmove(table_lookup[1][-i])
+                        i -= 1
+                    return bestboard
+        
         moves = self.board.getsortedmoves() 
-        #moves = list(self.board.getmoves())
+        
         
         #if (childboard.drawable()):
         #    drawboard = BoardWrapper(chess.Board, True)
@@ -35,7 +52,7 @@ class MoveTreeNode():
                     childboard = BoardWrapper(self.e)
                     childboard.board = self.board.board.copy() 
                     childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
+                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
                     self.children.append(childnode)
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
@@ -59,7 +76,7 @@ class MoveTreeNode():
                     childboard = BoardWrapper(self.e)
                     childboard.board = self.board.board.copy() 
                     childboard.pushmove(i)
-                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e)
+                    childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
                     self.children.append(childnode)
                     board : BoardWrapper = childnode.addchildren(alpha, beta)
                     eval = board.shalloweval(self.piececolor)
