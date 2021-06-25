@@ -25,9 +25,9 @@ class MoveTreeNode():
         if table_lookup:
             #position found in hash table
             if table_lookup[0] == self.board.getfen():
-                if table_lookup[4] >= (self.maxdepth - self.movesahead):
+                if table_lookup[2] >= (self.maxdepth - self.movesahead):
                     bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
-                    i = table_lookup[4]
+                    i = table_lookup[2]
                     while i > 0:
                         bestboard.pushmove(table_lookup[1][-i])
                         i -= 1
@@ -70,7 +70,9 @@ class MoveTreeNode():
                     beta = min(beta, best_eval)
                 if (alpha >= beta):
                     break #prune branch
-                
+            if (self.movesahead == 2):
+                #hash positions at depth 2
+                self.TTable.put(self.board.board, best_child.getmovestack(), self.movesahead)    
             return best_child
             
                 
