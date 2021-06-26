@@ -105,28 +105,41 @@ class BoardWrapper():
         return self.board.move_stack.copy()
     def getcopy(self):
         return copy.copy(self)
-    def getsortedmoves(self):
+    def getsortedmoves(self, piececolor):
         promotions = []
+        
         captures = []
         others = []
-        
+        valfinder = SquareValue()
         moves = list(self.getmoves())
+        max_victim = 0
+        min_aggressor = 5
+        best_capture = None
         for i in moves:
             attackedpiece = self.getpiece(i.to_square)
             movedpiece = self.getpiece(i.from_square)
+            
             if (i.promotion):
                 promotions.append(i)
             elif (attackedpiece):
-                if (attackedpiece.piece_type > 1 and attackedpiece.piece_type < 6):
-                    if (movedpiece.piece_type < attackedpiece.piece_type):
-                        captures.append(i)
-                    else:
-                        others.append(i)    
+                victim_value = attackedpiece.piece_type
+                aggressor_value = movedpiece.piece_type
+                if (victim_value - aggressor_value) > (max_victim - min_aggressor):
+                    if best_capture:
+                        captures.append(best_capture)
+                    best_capture = i
+                    max_victim = victim_value
+                    min_aggressor = aggressor_value
+
                 else:
-                    others.append(i)
+                    captures.append(i)
             else:
                 others.append(i)
+        
+        if (best_capture):
+            promotions.append(best_capture) # inserting the best capture before the other captures
         sorted = promotions + captures + others
+       
         return sorted
     
     
