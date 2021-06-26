@@ -64,7 +64,7 @@ class TestBot(unittest.TestCase):
     
          
     def test_tree_table_lookup(self):
-        #t = TTable()
+        
         e = EndgamePredictor()
         b = BoardWrapper(e)
         tree = MoveTreeNode(b, 0, 4, chess.WHITE, e)
@@ -74,5 +74,11 @@ class TestBot(unittest.TestCase):
         print(str(s))
         self.assertLess(s, 3346)
 
-    
+    def test_MVVLVA(self):
+        e = EndgamePredictor()
+        bw = BoardWrapper(e, chess.Board("r1bqk2r/1ppp1p1p/p1n3pn/2b1p1B1/1PB1P3/3P1N2/P1P2PPP/RN1QK2R w KQkq - 0 7"))
+        moves = bw.getsortedmoves(chess.WHITE)
+        
+        self.assertEqual(moves[0], chess.Move.from_uci('g5d8'))
+        
 unittest.main()

@@ -33,7 +33,7 @@ class MoveTreeNode():
                         i -= 1
                     return bestboard
         
-        moves = self.board.getsortedmoves() 
+        moves = self.board.getsortedmoves(self.piececolor) 
         
         
         #if (childboard.drawable()):

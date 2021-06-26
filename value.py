@@ -137,33 +137,36 @@ class SquareValue():
             modifier = -1
         
         #add modifiers based on what square the pawn is on
-        if (use_table):
-            if (piece.piece_type == chess.PAWN):
-                val = pawn
+        
+        if (piece.piece_type == chess.PAWN):
+            val = pawn
+            if use_table:
                 val = val + self.getpawnmodifier(square, piece.color)
-            elif (piece.piece_type == chess.KNIGHT):
-                val = knight
+        elif (piece.piece_type == chess.KNIGHT):
+            val = knight
+            if use_table:
                 val = val + self.getknightmodifier(square, piece.color)
-            elif (piece.piece_type == chess.BISHOP):
-                val = bishop
+        elif (piece.piece_type == chess.BISHOP):
+            val = bishop
+            if use_table:
                 val = val + self.getbishopmodifier(square, piece.color)
-            elif (piece.piece_type == chess.ROOK):
-                val = rook
+        elif (piece.piece_type == chess.ROOK):
+            val = rook
+            if use_table:
                 val = val + self.getrookmodifier(square, piece.color)
-            elif (piece.piece_type == chess.QUEEN):
-                val = queen
+        elif (piece.piece_type == chess.QUEEN):
+            val = queen
+            if use_table:
                 val = val + self.getqueenmodifier(square, piece.color)
-            elif (piece.piece_type == chess.KING):
-                val = king
-                
+        elif (piece.piece_type == chess.KING):
+            val = king
+            if use_table:
                 if (is_endgame):
                     val = val + self.getkingendmodifier(square, piece.color)
                 else:
                     val = val + self.getkingmodifier(square, piece.color)
 
-        #If it isn't a pawn, ignore for now
-        else:
-            pass
+        
         val = val * modifier
         return val
         
