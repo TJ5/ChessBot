@@ -25,11 +25,14 @@ class MoveTreeNode():
         if table_lookup:
             #position found in hash table
             if table_lookup[0] == self.board.getfen():
-                if table_lookup[2] >= (self.maxdepth - self.movesahead):
+                if table_lookup[2] >= (self.maxdepth - self.movesahead): #hashed depth is sufficent in completing the search to maxdepth or greater
                     bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
-                    i = table_lookup[2]
+                    i = self.maxdepth
                     while i > 0:
-                        bestboard.pushmove(table_lookup[1][-i])
+                        if (i > table_lookup[2]): 
+                            bestboard.board.move_stack.append(table_lookup[1][-i])
+                        else:
+                            bestboard.pushmove(table_lookup[1][-i])
                         i -= 1
                     return bestboard
         
