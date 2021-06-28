@@ -110,7 +110,7 @@ class BoardWrapper():
         
         captures = []
         others = []
-        valfinder = SquareValue()
+        
         moves = list(self.getmoves())
         max_victim = 0
         min_aggressor = 5

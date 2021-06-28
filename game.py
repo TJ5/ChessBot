@@ -7,7 +7,7 @@ class Game(threading.Thread):
         super().__init__(**kwargs)
         self.game_id = game_id
         self.client = client
-
+        
         #set stream to test stream or lichess stream
         #initialize test_mode var to know where to make moves
         if (isinstance(client, MockClient)):
@@ -20,17 +20,20 @@ class Game(threading.Thread):
         #define variable to store which side the bot plays
         self.botpieces = "white"
         self.current_state = next(self.stream) #stores JSON on all pertinent info to the game on start
-        if (not (self.current_state['white']['id'] == 'whenchess')):
-            self.botpieces = "black"
+        if 'id' in self.current_state['black']:
+            if (self.current_state['black']['id'] == 'whenchess'):
+                self.botpieces = "black"
+                
             
         #intialize a bot object to pass board state to
         self.bot = Bot(self.botpieces, fen)
-    
+        self.start()
     
     def run(self):
         #play the first move if white
         if (self.botpieces == "white"):
             self.handle_state_change(self.current_state['state'])
+        
         #event loop for game state updates
         for event in self.stream:
             
