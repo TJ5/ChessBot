@@ -28,16 +28,12 @@ class MoveTreeNode():
             if table_lookup[0] == self.board.getfen():
                 if table_lookup[2] >= (self.maxdepth - self.movesahead): #hashed depth is sufficent in completing the search to maxdepth or greater
                     bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
-                    i = self.maxdepth
-                    while i > 0:
-                        if (i > table_lookup[2]): 
-                            bestboard.board.move_stack.append(table_lookup[1][-i])
-                        else:
-                            bestboard.pushmove(table_lookup[1][-i])
-                        i -= 1
+                    for i in table_lookup[1]:
+                        bestboard.pushmove(i)
+                        
                     return bestboard
                 else:
-                    hash_move = table_lookup[1][-(table_lookup[2])]
+                    hash_move = table_lookup[1][0]
         if hash_move:
             moves = self.board.getsortedmoves(hash_move) 
         else:
@@ -77,9 +73,9 @@ class MoveTreeNode():
                     beta = min(beta, best_eval)
                 if (alpha >= beta):
                     break #prune branch
-            if (self.movesahead == 2):
-                #hash positions at depth 2
-                self.TTable.put(self.board.board, best_child.getmovestack(), self.movesahead)    
+            if (self.maxdepth - self.movesahead == 2):
+                #hash positions at 2 plies from leaves
+                self.TTable.put(self.board.board, best_child.getmovestack()[-2:], self.movesahead)    
             return best_child
             
                 
@@ -117,14 +113,21 @@ class MoveTreeNode():
     
         
     def getbestmove(self):
+        
+        
         now = time.time()
+        
+        
+        
         bestboard : BoardWrapper = self.addchildren((-1 * math.inf), math.inf)
-        t = time.time() - now
+        
+
+        search_time = time.time() - now
         s = self.size()
         is_endgame : bool = bestboard.is_endgame()
         movestack = bestboard.getmovestack()
         f = open("log.txt", "a")
-        f.write("[TIME THIS MOVE]: " + str(t) + " [TIME PER NODE]: " + str(t/s) + "\n")
+        f.write("[TIME THIS MOVE]: " + str(search_time) + " [TIME PER NODE]: " + str(search_time/s) + "\n")
         f.write("[LEAVES SEARCHED]: " + str(s) + "\n")
         f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
         f.write("[IS ENDGAME]: " + str(is_endgame) + "\n")
