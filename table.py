@@ -21,7 +21,7 @@ class TTable():
 
         if val in self.table:
             if self.table[val][0] == fen:
-                if self.table[val][depth] < depth:
+                if self.table[val][2] < depth:
                     self.table[val] = [fen, move_stack, depth]
                     return
                 else:

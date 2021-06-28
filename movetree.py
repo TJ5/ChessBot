@@ -20,7 +20,7 @@ class MoveTreeNode():
             self.TTable = TTable()
         
         
-    def addchildren(self, alpha, beta):
+    def addchildren(self, alpha, beta, previous_move=None):
         table_lookup = self.TTable.get(self.board.board)
         hash_move = None
         if table_lookup:
@@ -35,9 +35,9 @@ class MoveTreeNode():
                 else:
                     hash_move = table_lookup[1][0]
         if hash_move:
-            moves = self.board.getsortedmoves(hash_move) 
+            moves = self.board.getsortedmoves(hash_move, previous_move) 
         else:
-            moves = self.board.getsortedmoves()
+            moves = self.board.getsortedmoves(previous_move)
         
         #if (childboard.drawable()):
         #    drawboard = BoardWrapper(chess.Board, True)
@@ -117,10 +117,17 @@ class MoveTreeNode():
         
         now = time.time()
         
-        
-        
-        bestboard : BoardWrapper = self.addchildren((-1 * math.inf), math.inf)
-        
+        goal = self.maxdepth
+        self.maxdepth = 1
+        bestboard = None 
+        move = None
+        while self.maxdepth <= goal:
+            if move:
+                bestboard : BoardWrapper = self.addchildren((-1 * math.inf), math.inf, previous_move=move)
+            else:
+                bestboard : BoardWrapper = self.addchildren(-1 * math.inf, math.inf)
+            move = bestboard.getmovestack()[len(self.board.getmovestack())]
+            self.maxdepth += 1
 
         search_time = time.time() - now
         s = self.size()
