@@ -105,7 +105,7 @@ class BoardWrapper():
         return self.board.move_stack.copy()
     def getcopy(self):
         return copy.copy(self)
-    def getsortedmoves(self, piececolor):
+    def getsortedmoves(self, hash_move=None):
         promotions = []
         
         captures = []
@@ -116,6 +116,8 @@ class BoardWrapper():
         min_aggressor = 5
         best_capture = None
         for i in moves:
+            if i == hash_move:
+                continue
             attackedpiece = self.getpiece(i.to_square)
             movedpiece = self.getpiece(i.from_square)
             
@@ -135,11 +137,14 @@ class BoardWrapper():
                     captures.append(i)
             else:
                 others.append(i)
-        
+        sorted = []
         if (best_capture):
             promotions.append(best_capture) # inserting the best capture before the other captures
-        sorted = promotions + captures + others
-       
+        if hash_move:
+            sorted.append(hash_move)
+            sorted = sorted + promotions + captures + others
+        else:
+            sorted = promotions + captures + others
         return sorted
     
     

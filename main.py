@@ -8,7 +8,8 @@ token = F.readline()
 session = berserk.TokenSession(token)
 client = berserk.Client(session)
 print(client.account.get_email()) #test client is working
-
+#client.challenges.create_ai(level=5, color='white')
+#client.challenges.create('yeastApe', False, color = 'black')
 fendict = {}
 for event in client.bots.stream_incoming_events():
     
@@ -30,13 +31,13 @@ for event in client.bots.stream_incoming_events():
         print(event)
         #Call a Game object that handles the stream of state changes of the game 
         id = event['game']['id']
-        try:
+        if event['game']['id'] in fendict:
             fen = fendict[event['game']['id']]
             game = Game(client, id, fen)
-        except: 
+        else:
             
             game = Game(client, id)
         
-        game.start()    
+        #game.start()    
 
         

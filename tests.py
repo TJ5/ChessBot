@@ -18,7 +18,7 @@ class TestBot(unittest.TestCase):
         m = MockClient()
         game = Game(m, True)
         
-        game.start()
+        
         game.join()
         current_state = game.current_state
         self.assertEqual(current_state["type"], "gameFull")
@@ -77,8 +77,14 @@ class TestBot(unittest.TestCase):
     def test_MVVLVA(self):
         e = EndgamePredictor()
         bw = BoardWrapper(e, chess.Board("r1bqk2r/1ppp1p1p/p1n3pn/2b1p1B1/1PB1P3/3P1N2/P1P2PPP/RN1QK2R w KQkq - 0 7"))
-        moves = bw.getsortedmoves(chess.WHITE)
+        moves = bw.getsortedmoves()
         
         self.assertEqual(moves[0], chess.Move.from_uci('g5d8'))
+
+    def test_hash_move_ordering(self):
+        e = EndgamePredictor()
+        bw = BoardWrapper(e, chess.Board())
+        moves = bw.getsortedmoves(chess.Move.from_uci('e2e4'))
+        self.assertEqual(moves[0], chess.Move.from_uci('e2e4'))
         
 unittest.main()

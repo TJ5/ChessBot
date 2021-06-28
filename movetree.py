@@ -22,6 +22,7 @@ class MoveTreeNode():
         
     def addchildren(self, alpha, beta):
         table_lookup = self.TTable.get(self.board.board)
+        hash_move = None
         if table_lookup:
             #position found in hash table
             if table_lookup[0] == self.board.getfen():
@@ -35,9 +36,12 @@ class MoveTreeNode():
                             bestboard.pushmove(table_lookup[1][-i])
                         i -= 1
                     return bestboard
-        
-        moves = self.board.getsortedmoves(self.piececolor) 
-        
+                else:
+                    hash_move = table_lookup[1][-(table_lookup[2])]
+        if hash_move:
+            moves = self.board.getsortedmoves(hash_move) 
+        else:
+            moves = self.board.getsortedmoves()
         
         #if (childboard.drawable()):
         #    drawboard = BoardWrapper(chess.Board, True)
