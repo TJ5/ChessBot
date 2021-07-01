@@ -2,6 +2,8 @@ from boardwrapper import BoardWrapper
 import chess
 from movetree import MoveTreeNode
 from endgame import EndgamePredictor
+import threading
+import sys
 class Bot():
     def __init__(self, piececolor: str, fen = chess.STARTING_FEN):
         self.e = EndgamePredictor()
@@ -11,6 +13,7 @@ class Bot():
             self.piececolor = chess.WHITE
         else:
             self.piececolor = chess.BLACK
+        self.time_event = threading.Event()
         
     #updates board representing game state and returns move to make, if applicable
     def updateboard(self, moves: str):
@@ -37,7 +40,10 @@ class Bot():
         #else, ignore
         if (self.board.getturn() == self.piececolor):
             tree = MoveTreeNode(self.board, 0, 4, self.piececolor, self.e)
-            move = tree.getbestmove()
+            self.time_event.clear()
+            timer_thread = threading.Timer(15, self.timer,kwargs={'event': self.time_event})
+            timer_thread.start()
+            move = tree.getbestmove(self.time_event)
             
             return move
         else:
@@ -51,3 +57,13 @@ class Bot():
     #gets a heuristic evaluation of the board
     def shalloweval(self):
         return self.board.shalloweval(self.piececolor)
+
+    def timer(self, event : threading.Event):
+        
+        event.set()
+        print('event SET')
+        
+        
+        sys.exit()
+
+    

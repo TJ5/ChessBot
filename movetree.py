@@ -20,64 +20,78 @@ class MoveTreeNode():
             self.TTable = TTable()
         
         
-    def addchildren(self, alpha, beta, previous_move=None):
+    def addchildren(self, timer_event, alpha, beta, previous_move=None):
+        
         table_lookup = self.TTable.get(self.board.board)
         hash_move = None
-        if table_lookup:
-            #position found in hash table
-            if table_lookup[0] == self.board.getfen():
-                if table_lookup[2] >= (self.maxdepth - self.movesahead): #hashed depth is sufficent in completing the search to maxdepth or greater
-                    bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
-                    for i in table_lookup[1]:
-                        bestboard.pushmove(i)
-                        
-                    return bestboard
-                else:
-                    hash_move = table_lookup[1][0]
-        if hash_move:
-            moves = self.board.getsortedmoves(hash_move, previous_move) 
-        else:
-            moves = self.board.getsortedmoves(previous_move)
         
-        #if (childboard.drawable()):
-        #    drawboard = BoardWrapper(chess.Board, True)
-        #    drawboard.board = childboard.board.copy()
-        #    self.children.append(MoveTreeNode(drawboard, self.movesahead + 1, self.maxdepth, self.piececolor))
-        
-        if (len(moves) == 0 or self.movesahead == self.maxdepth):
-            return self.board
-            
-        else:
-            
-            best_child = None
-            best_eval = (-1 * math.inf) if self.movesahead % 2 == 0 else math.inf
-            for i in moves:
-                childboard = BoardWrapper(self.e)
-                childboard.board = self.board.board.copy() 
-                childboard.pushmove(i)
-                childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
-                self.children.append(childnode)
-                board : BoardWrapper = childnode.addchildren(alpha, beta)
-                eval = board.shalloweval(self.piececolor)
-                if (self.movesahead % 2 == 0 and eval > best_eval) or (self.movesahead % 2 == 1 and eval < best_eval):
-                    best_eval = eval
-                    best_child = board
-                elif (eval == best_eval):
-                    if (len(board.getmovestack()) < len(best_child.getmovestack())):
-                        best_child = board
+        while not timer_event.is_set():
+            if table_lookup:
+                #position found in hash table
+                if table_lookup[0] == self.board.getfen():
+                    if table_lookup[2] >= (self.maxdepth - self.movesahead): #hashed depth is sufficent in completing the search to maxdepth or greater
+                        bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
+                        i = 0
+                        while (i < len(table_lookup[1])):
+                            if i < (len(table_lookup[1]) - table_lookup[2]):
+                                bestboard.board.move_stack.append(table_lookup[1][i])
+                            else:
+                                bestboard.pushmove(table_lookup[1][i])
+                            i += 1
+                            
+                        return bestboard
                     else:
-                        pass
-                if (self.movesahead % 2 == 0):
-                    alpha = max(alpha, best_eval)
-                else:
-                    beta = min(beta, best_eval)
-                if (alpha >= beta):
-                    break #prune branch
-            if (self.maxdepth - self.movesahead == 2):
-                #hash positions at 2 plies from leaves
-                self.TTable.put(self.board.board, best_child.getmovestack()[-2:], self.movesahead)    
-            return best_child
+                        hash_move = table_lookup[1][self.movesahead]
+            if hash_move:
+                moves = self.board.getsortedmoves(hash_move, previous_move) 
+            else:
+                moves = self.board.getsortedmoves(previous_move)
             
+            
+            
+            if (len(moves) == 0 or self.movesahead == self.maxdepth):
+                return self.board
+                
+            else:
+                
+                best_child = None
+                best_eval = (-1 * math.inf) if self.movesahead % 2 == 0 else math.inf
+                for i in moves:
+                    if not timer_event.is_set():
+                        childboard = BoardWrapper(self.e)
+                        childboard.board = self.board.board.copy() 
+                        childboard.pushmove(i)
+                        childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
+                        self.children.append(childnode)
+                        board : BoardWrapper = childnode.addchildren(timer_event, alpha, beta)
+                        if board:
+                            eval = board.shalloweval(self.piececolor)
+                            if (self.movesahead % 2 == 0 and eval > best_eval) or (self.movesahead % 2 == 1 and eval < best_eval):
+                                best_eval = eval
+                                best_child = board
+                            elif (eval == best_eval):
+                                if (len(board.getmovestack()) < len(best_child.getmovestack())):
+                                    best_child = board
+                                else:
+                                    pass
+                            if (self.movesahead % 2 == 0):
+                                alpha = max(alpha, best_eval)
+                            else:
+                                beta = min(beta, best_eval)
+                            if (alpha >= beta):
+                                break #prune branch
+                    else:
+                        return
+                if (self.maxdepth - self.movesahead == 2):
+                    #hash positions at 2 plies from leaves
+                    movestack = best_child.getmovestack()
+                    difference = len(movestack) - len(self.board.getmovestack())
+                    best_child_movesahead = difference + self.movesahead
+                    #difference in most cases will be 2, but could be less if the game ends
+                    
+                    self.TTable.put(self.board.board, movestack[-1*best_child_movesahead:], self.maxdepth - self.movesahead)    
+                return best_child
+        return    
                 
     def __str__(self):
         
@@ -112,23 +126,32 @@ class MoveTreeNode():
 
     
         
-    def getbestmove(self):
-        
+    def getbestmove(self, timer_event):
+        print("GET BEST MOVE CALLED")
         
         now = time.time()
         
-        goal = self.maxdepth
+        
         self.maxdepth = 1
         bestboard = None 
         move = None
-        while self.maxdepth <= goal:
-            if move:
-                bestboard : BoardWrapper = self.addchildren((-1 * math.inf), math.inf, previous_move=move)
-            else:
-                bestboard : BoardWrapper = self.addchildren(-1 * math.inf, math.inf)
-            move = bestboard.getmovestack()[len(self.board.getmovestack())]
-            self.maxdepth += 1
+        current_best = None
+        while not timer_event.is_set():
+            
 
+            if move:
+                current_best : BoardWrapper = self.addchildren(timer_event, (-1 * math.inf), math.inf, previous_move=move)
+            else:
+                current_best : BoardWrapper = self.addchildren(timer_event, -1 * math.inf, math.inf)
+            if current_best:
+                print(str(current_best.getmovestack()))
+                
+                #bestboard is the var to be returned, and only stores searches which have been completed.
+                bestboard = current_best
+                move = bestboard.getmovestack()[len(self.board.getmovestack())]
+                self.maxdepth += 1
+            
+        print('set')
         search_time = time.time() - now
         s = self.size()
         is_endgame : bool = bestboard.is_endgame()
@@ -139,7 +162,7 @@ class MoveTreeNode():
         f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
         f.write("[IS ENDGAME]: " + str(is_endgame) + "\n")
         f.write("[EVAL AFTER MOVES]: " + str(bestboard.shalloweval(self.piececolor)))
-        f.write("[MOVES FROM " + str(self.maxdepth) + " DEPTH]: ")
+        f.write("[MOVES FROM " + str(len(movestack) - len(self.board.getmovestack())) + " DEPTH]: ")
         i = len(self.board.getmovestack())
         while (i < len(movestack)):
             f.write(str(movestack[i]) + " ")
