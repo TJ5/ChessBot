@@ -20,7 +20,7 @@ class MoveTreeNode():
             self.TTable = TTable()
         
         
-    def addchildren(self, timer_event, alpha, beta, previous_move=None):
+    def addchildren(self, timer_event, alpha, beta, previous_movestack=None):
         
         table_lookup = self.TTable.get(self.board.board)
         hash_move = None
@@ -42,12 +42,18 @@ class MoveTreeNode():
                         return bestboard
                     else:
                         hash_move = table_lookup[1][self.movesahead]
-            if hash_move:
-                moves = self.board.getsortedmoves(hash_move, previous_move) 
+            if previous_movestack:
+                last_len = len(previous_movestack)
             else:
-                moves = self.board.getsortedmoves(previous_move)
-            
-            
+                last_len = -1
+            if hash_move and (last_len > (self.movesahead)):
+                moves = self.board.getsortedmoves(hash_move, previous_movestack[self.movesahead]) 
+            elif (last_len > (self.movesahead)):
+                moves = self.board.getsortedmoves(previous_move=previous_movestack[self.movesahead])
+            elif hash_move:
+                moves = self.board.getsortedmoves(hash_move)
+            else:
+                moves = self.board.getsortedmoves()
             
             if (len(moves) == 0 or self.movesahead == self.maxdepth):
                 return self.board
@@ -63,7 +69,7 @@ class MoveTreeNode():
                         childboard.pushmove(i)
                         childnode = MoveTreeNode(childboard, self.movesahead + 1, self.maxdepth, self.piececolor, self.e, self.TTable)
                         self.children.append(childnode)
-                        board : BoardWrapper = childnode.addchildren(timer_event, alpha, beta)
+                        board : BoardWrapper = childnode.addchildren(timer_event, alpha, beta, previous_movestack)
                         if board:
                             eval = board.shalloweval(self.piececolor)
                             if (self.movesahead % 2 == 0 and eval > best_eval) or (self.movesahead % 2 == 1 and eval < best_eval):
@@ -89,7 +95,7 @@ class MoveTreeNode():
                     best_child_movesahead = difference + self.movesahead
                     #difference in most cases will be 2, but could be less if the game ends
                     
-                    self.TTable.put(self.board.board, movestack[-1*best_child_movesahead:], self.maxdepth - self.movesahead)    
+                    self.TTable.put(self.board.board, movestack[-1*best_child_movesahead:], difference)    
                 return best_child
         return    
                 
@@ -140,7 +146,9 @@ class MoveTreeNode():
             
 
             if move:
-                current_best : BoardWrapper = self.addchildren(timer_event, (-1 * math.inf), math.inf, previous_move=move)
+                diff = len(bestboard.getmovestack()) - len(self.board.getmovestack()) 
+                #mostly self.maxdepth, but we calculate it to compensate for the chance it is less if the game ends
+                current_best : BoardWrapper = self.addchildren(timer_event, (-1 * math.inf), math.inf, previous_movestack=bestboard.getmovestack()[-diff:])
             else:
                 current_best : BoardWrapper = self.addchildren(timer_event, -1 * math.inf, math.inf)
             if current_best:

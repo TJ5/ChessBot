@@ -92,7 +92,9 @@ class BoardWrapper():
                                 #    eval -= value
                                 #    break
                                 att = abs(valfinder.getpiecevalue(attackers[j], piececolor, self.board.piece_at(attackers[j]), is_endgame))
-                                if (abs(value) > att): 
+                                #att = self.getpiece(attackers[j]).piece_type
+                                if (abs(value) > att):
+                                #if piece.piece_type >= att: 
                                     if (abs(value) - abs(att) >= 100):
                                         eval -= value
                                         break
@@ -110,15 +112,21 @@ class BoardWrapper():
         
         captures = []
         others = []
-
+        sorted = []
         
         moves = list(self.getmoves())
         max_victim = 0
         min_aggressor = 5
         best_capture = None
         for i in moves:
-            if i == hash_move or i == previous_move:
+            if i == hash_move:
+                sorted.append(hash_move)
                 continue
+            elif i == previous_move:
+                sorted.append(previous_move)
+                continue
+
+
             attackedpiece = self.getpiece(i.to_square)
             movedpiece = self.getpiece(i.from_square)
             
@@ -138,14 +146,14 @@ class BoardWrapper():
                     captures.append(i)
             else:
                 others.append(i)
-        sorted = []
+        
         if (best_capture):
             promotions.append(best_capture) # inserting the best capture before the other captures
-        if previous_move:
-            sorted.append(previous_move)
+        
             
-        if hash_move and (not(hash_move == previous_move)):
-            sorted.append(hash_move)
+            
+        
+            
             
         sorted += promotions + captures + others
         return sorted
