@@ -65,7 +65,7 @@ class TestBot(unittest.TestCase):
         tree = MoveTreeNode(b, 0, 4, chess.WHITE, e)
         bestboard = tree.addchildren(event, (-1 * math.inf), math.inf)
         t.put(b.board,bestboard.getmovestack(), 4)
-        self.assertEqual(t.table[5060803636482931868], ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', [chess.Move.from_uci('g1f3'), chess.Move.from_uci('g8f6'), chess.Move.from_uci('b1c3'), chess.Move.from_uci('b8c6')], 4])
+        self.assertEqual(t.table[5060803636482931868], ['rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR', [chess.Move.from_uci('g1f3'), chess.Move.from_uci('g8f6'), chess.Move.from_uci('b1c3'), chess.Move.from_uci('b8c6')], 4])
         self.assertEqual(t.get(b.board)[1][0], chess.Move.from_uci('g1f3'))
     
          

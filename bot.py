@@ -4,6 +4,7 @@ from movetree import MoveTreeNode
 from endgame import EndgamePredictor
 import threading
 import sys
+from table import TTable
 class Bot():
     def __init__(self, piececolor: str, fen = chess.STARTING_FEN):
         self.e = EndgamePredictor()
@@ -14,7 +15,7 @@ class Bot():
         else:
             self.piececolor = chess.BLACK
         self.time_event = threading.Event()
-        
+        self.table = TTable()
     #updates board representing game state and returns move to make, if applicable
     def updateboard(self, moves: str):
         self.board = self.board.updateboard(moves)
@@ -39,12 +40,12 @@ class Bot():
         #return move if it is the bot's turn to play]
         #else, ignore
         if (self.board.getturn() == self.piececolor):
-            tree = MoveTreeNode(self.board, 0, 4, self.piececolor, self.e)
+            tree = MoveTreeNode(self.board, 0, 4, self.piececolor, self.e, self.table)
             self.time_event.clear()
             timer_thread = threading.Timer(20, self.timer,kwargs={'event': self.time_event})
             timer_thread.start()
             move = tree.getbestmove(self.time_event)
-            
+            self.table = tree.TTable
             return move
         else:
             return None

@@ -28,7 +28,7 @@ class MoveTreeNode():
         while not timer_event.is_set():
             if table_lookup:
                 #position found in hash table
-                if table_lookup[0] == self.board.getfen():
+                if table_lookup[0] == self.board.get_board_fen():
                     if table_lookup[2] >= (self.maxdepth - self.movesahead): #hashed depth is sufficent in completing the search to maxdepth or greater
                         bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
                         bestboard.board.move_stack = self.board.board.move_stack.copy()
@@ -157,7 +157,7 @@ class MoveTreeNode():
             else:
                 current_best : BoardWrapper = self.addchildren(timer_event, -1 * math.inf, math.inf)
             if current_best:
-                print(str(current_best.getmovestack()))
+                #print(str(current_best.getmovestack()))
                 
                 #bestboard is the var to be returned, and only stores searches which have been completed.
                 bestboard = current_best

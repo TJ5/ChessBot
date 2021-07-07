@@ -161,3 +161,6 @@ class BoardWrapper():
     
     def is_endgame(self):
         return self.e.is_endgame(self.getfen())
+
+    def get_board_fen(self):
+        return self.board.board_fen()

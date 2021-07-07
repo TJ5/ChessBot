@@ -13,7 +13,7 @@ class TTable():
         return chess.polyglot.zobrist_hash(board)
     def put(self, board : chess.Board, move_stack, depth : int):
         val = self.hash(board)
-        fen = board.fen()
+        fen = board.board_fen()
 
         #if an entry already exists in the table for the given hash key, 
         #check if it is the same position or not. If it is, overwrite it if the new entry is at a higher depth.
