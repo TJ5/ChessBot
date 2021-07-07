@@ -41,7 +41,7 @@ class Bot():
         if (self.board.getturn() == self.piececolor):
             tree = MoveTreeNode(self.board, 0, 4, self.piececolor, self.e)
             self.time_event.clear()
-            timer_thread = threading.Timer(15, self.timer,kwargs={'event': self.time_event})
+            timer_thread = threading.Timer(20, self.timer,kwargs={'event': self.time_event})
             timer_thread.start()
             move = tree.getbestmove(self.time_event)
             

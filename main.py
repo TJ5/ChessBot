@@ -8,7 +8,7 @@ token = F.readline()
 session = berserk.TokenSession(token)
 client = berserk.Client(session)
 print(client.account.get_email()) #test client is working
-#client.challenges.create_ai(level=5, color='white')
+client.challenges.create_ai(level=8, color='white')
 #client.challenges.create('yeastApe', False, color = 'black')
 fendict = {}
 for event in client.bots.stream_incoming_events():
@@ -36,7 +36,7 @@ for event in client.bots.stream_incoming_events():
             game = Game(client, id, fen)
         else:
             
-            game = Game(client, id)
+            game = Game(client, id, '8/8/3k4/8/8/4K3/8/4Q3 w - - 0 1')
         
         #game.start()    
 

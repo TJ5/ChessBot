@@ -31,29 +31,32 @@ class MoveTreeNode():
                 if table_lookup[0] == self.board.getfen():
                     if table_lookup[2] >= (self.maxdepth - self.movesahead): #hashed depth is sufficent in completing the search to maxdepth or greater
                         bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
-                        i = 0
+                        bestboard.board.move_stack = self.board.board.move_stack.copy()
+                        i = len(table_lookup[1]) - table_lookup[2]
                         while (i < len(table_lookup[1])):
-                            if i < (len(table_lookup[1]) - table_lookup[2]):
-                                bestboard.board.move_stack.append(table_lookup[1][i])
-                            else:
-                                bestboard.pushmove(table_lookup[1][i])
+                            bestboard.pushmove(table_lookup[1][i])
                             i += 1
                             
                         return bestboard
                     else:
                         hash_move = table_lookup[1][self.movesahead]
+            previous_move = None
+            #if previous_movestack:
+            #    compare = previous_movestack[:self.movesahead]
+            #    if compare == self.board.getmovestack():
+            #        if len(previous_movestack) > len(self.board.getmovestack()[-self.movesahead:]):
+            #            previous_move = previous_movestack[self.movesahead]
             if previous_movestack:
                 last_len = len(previous_movestack)
             else:
                 last_len = -1
-            if hash_move and (last_len > (self.movesahead)):
-                moves = self.board.getsortedmoves(hash_move, previous_movestack[self.movesahead]) 
-            elif (last_len > (self.movesahead)):
-                moves = self.board.getsortedmoves(previous_move=previous_movestack[self.movesahead])
-            elif hash_move:
-                moves = self.board.getsortedmoves(hash_move)
-            else:
-                moves = self.board.getsortedmoves()
+            if (last_len > (self.movesahead)):
+                previous_move = previous_movestack[self.movesahead]
+            
+            moves = self.board.getsortedmoves(hash_move, previous_move) 
+            
+            
+            
             
             if (len(moves) == 0 or self.movesahead == self.maxdepth):
                 return self.board
@@ -118,15 +121,17 @@ class MoveTreeNode():
         return ret
     
     #returns number of leaf nodes 
-    def size(self):
+    def size(self, max=None):
+        if not max:
+            max = self.maxdepth
         counter = 0
         #if leaf node - basecase
-        if (len(self.children) == 0):
+        if (len(self.children) == 0 or self.movesahead == max):
             return 1
         else:
             i = 0
             while (i < len(self.children)):
-                counter = counter + self.children[i].size()
+                counter = counter + self.children[i].size(max)
                 i = i + 1
         return counter
 
@@ -161,16 +166,18 @@ class MoveTreeNode():
             
         print('set')
         search_time = time.time() - now
-        s = self.size()
+        
         is_endgame : bool = bestboard.is_endgame()
         movestack = bestboard.getmovestack()
+        depth = len(movestack) - len(self.board.getmovestack())
+        s = self.size(depth)
         f = open("log.txt", "a")
         f.write("[TIME THIS MOVE]: " + str(search_time) + " [TIME PER NODE]: " + str(search_time/s) + "\n")
         f.write("[LEAVES SEARCHED]: " + str(s) + "\n")
         f.write("[CURRENT POSITION]: " + self.board.getfen() + "\n")
         f.write("[IS ENDGAME]: " + str(is_endgame) + "\n")
         f.write("[EVAL AFTER MOVES]: " + str(bestboard.shalloweval(self.piececolor)))
-        f.write("[MOVES FROM " + str(len(movestack) - len(self.board.getmovestack())) + " DEPTH]: ")
+        f.write("[MOVES FROM " + str(depth) + " DEPTH]: ")
         i = len(self.board.getmovestack())
         while (i < len(movestack)):
             f.write(str(movestack[i]) + " ")
