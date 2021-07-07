@@ -28,9 +28,10 @@ class MoveTreeNode():
         while not timer_event.is_set():
             if table_lookup:
                 #position found in hash table
-                if table_lookup[0] == self.board.get_board_fen():
+                if table_lookup[0] == self.board.get_board_fen() and table_lookup[3] == self.board.getturn():
                     if table_lookup[2] >= (self.maxdepth - self.movesahead): #hashed depth is sufficent in completing the search to maxdepth or greater
                         bestboard = BoardWrapper(self.e, chess.Board(table_lookup[0]))
+                        bestboard.board.turn = table_lookup[3]
                         bestboard.board.move_stack = self.board.board.move_stack.copy()
                         i = len(table_lookup[1]) - table_lookup[2]
                         while (i < len(table_lookup[1])):
@@ -39,7 +40,8 @@ class MoveTreeNode():
                             
                         return bestboard
                     else:
-                        hash_move = table_lookup[1][self.movesahead]
+                        if len(table_lookup[1]) >= (self.movesahead + 1):
+                            hash_move = table_lookup[1][self.movesahead]
             previous_move = None
             #if previous_movestack:
             #    compare = previous_movestack[:self.movesahead]
@@ -92,13 +94,14 @@ class MoveTreeNode():
                     else:
                         return
                 if (self.maxdepth - self.movesahead == 2):
-                    #hash positions at 2 plies from leaves
-                    movestack = best_child.getmovestack()
-                    difference = len(movestack) - len(self.board.getmovestack())
-                    best_child_movesahead = difference + self.movesahead
-                    #difference in most cases will be 2, but could be less if the game ends
-                    
-                    self.TTable.put(self.board.board, movestack[-1*best_child_movesahead:], difference)    
+                    if best_child:
+                        #hash positions at 2 plies from leaves
+                        movestack = best_child.getmovestack()
+                        difference = len(movestack) - len(self.board.getmovestack())
+                        best_child_movesahead = difference + self.movesahead
+                        #difference in most cases will be 2, but could be less if the game ends
+                        
+                        self.TTable.put(self.board.board, movestack[-1*best_child_movesahead:], difference)    
                 return best_child
         return    
                 
@@ -157,7 +160,7 @@ class MoveTreeNode():
             else:
                 current_best : BoardWrapper = self.addchildren(timer_event, -1 * math.inf, math.inf)
             if current_best:
-                #print(str(current_best.getmovestack()))
+                print(str(current_best.getmovestack()))
                 
                 #bestboard is the var to be returned, and only stores searches which have been completed.
                 bestboard = current_best
