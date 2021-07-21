@@ -6,7 +6,7 @@ import numpy as np
 from value import SquareValue
 class EndgamePredictor():
     def __init__(self):
-        data = pd.read_excel('CheckEndgame.xlsx')
+        data = pd.read_csv('CheckEndgame.csv')
         data["Pieces"] = data.apply(lambda row: self.gettotalpieces(chess.Board(row["FEN"])), axis=1)
         data["Material"] = data.apply(lambda row: self.gettotalmaterial(chess.Board(row["FEN"])), axis=1)
         data["Major Pieces"] = data.apply(lambda row: self.getmajorpieces(chess.Board(row["FEN"])), axis=1)
