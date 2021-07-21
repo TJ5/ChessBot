@@ -92,5 +92,10 @@ class TestBot(unittest.TestCase):
         bw = BoardWrapper(e, chess.Board())
         moves = bw.getsortedmoves(chess.Move.from_uci('e2e4'))
         self.assertEqual(moves[0], chess.Move.from_uci('e2e4'))
-        
+    def test_endgame(self):
+        e = EndgamePredictor()
+        bw = BoardWrapper(e, chess.Board("rnbqkbnr/pp2pppp/3p4/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3"))
+        self.assertFalse(bw.is_endgame())
+        bw = BoardWrapper(e, chess.Board("8/5p2/2r5/8/p2KP3/P7/6kp/3R4 w - - 8 70"))
+        self.assertTrue(bw.is_endgame())
 unittest.main()
